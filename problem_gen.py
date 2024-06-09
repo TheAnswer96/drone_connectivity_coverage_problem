@@ -98,3 +98,31 @@ def generate_problem_instance(towers, trajectory, edge_p, seed, debug=True):
     G = generate_connectivity_graph(towers, edge_p, seed, debug)
     intervals = partition_trajectory(trajectory, towers)
     return intervals, G
+
+def can_cover_with_diameter(G, intervals, max_diameter):
+    for nodes_subset in nx.connected_components(G):
+        subgraph = G.subgraph(nodes_subset)
+        if nx.diameter(subgraph) <= max_diameter:
+            if is_coverage(max(max(interval) for interval in intervals), intervals):
+                return True
+    return False
+
+def find_minimum_diameter_subgraph(towers, trajectory, edge_p, seed, debug=True):
+    intervals, G = generate_problem_instance(towers, trajectory, edge_p, seed, debug)
+
+    low, high = 2, nx.diameter(G)
+    best_diameter = high
+
+    while low <= high:
+        mid = (low + high) // 2
+        if can_cover_with_diameter(G, intervals, mid):
+            best_diameter = mid
+            high = mid - 1
+        else:
+            low = mid + 1
+
+    return best_diameter
+
+min_diameter = find_minimum_diameter_subgraph(towers, trajectory, edge_p, seed)
+print("Minimum diameter of subgraph that can cover the trajectory:", min_diameter)
+
