@@ -2,6 +2,7 @@ import networkx as nx
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import sympy as sp
 
 '''
 Write here the code related to problem instances generation
@@ -18,12 +19,21 @@ def generate_problem_instance(config):
     debug = config["debug"]
 
     # 1 - generate a square of size "area_side" x "area_side"
+    area = [(0, 0), (area_side, 0), (area_side, area_side), (0, area_side)]
+    plt.plot([x for x, y in area], [y for x, y in area], 'k-')
 
     # 2 - randomly generate "towers" points with x,y coordinates each within 0 and "area_side"
+    random.seed(seed)
+    tower_points = [(random.uniform(0, area_side), random.uniform(0, area_side)) for _ in range(towers)]
+
 
     # 3 - for each tower, generate randomly a radius within "radius_min" and "radius_max"
+    tower_radii = [random.uniform(radius_min, radius_max) for _ in range(towers)]
+
 
     # 4 - generate "trajectories" trajectories by randomizing two endpoints each, each within 0 and "area_side"
+    trajectories_path = [[(random.uniform(0, area_side), random.uniform(0, area_side)) for _ in range(2)] for _ in
+                           range(trajectories)]
 
     # 5 - for each trajectory:
     # 5.1 - compute the intersection points among it and all the towers
