@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 from sympy import Polygon, Point
-
 '''
 Write here the code related to problem instances generation
 '''
@@ -54,13 +53,42 @@ def generate_problem_instance(config):
 
     # 5 - for each trajectory:
     # 5.1 - compute the intersection points among it and all the towers
+
+    intersection_points = []
+    for path in trajectories_paths:
+        x_1, y_1 = path[1]
+        x_2, y_2 = path[2]
+        for i in range(0, towers):
+            tower_x, tower_y = tower_points[i]
+            radius = tower_radii[i]
+            line = sp.Line(sp.Point(x_1, y_1), sp.Point(x_2, y_2))
+            circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
+            intersections = line.intersection(circle)
+            if intersections:
+                intersection_points.extend(intersections)
+
     # 5.2 - create the intervals. This is difficult. You can imagine this interval as a segment
     #       that goes from 0 (observer) to a certain distance (other endpoint).
     #       From 0, you compute the distance of all the intersection points, and then you can associate the intervals.
 
+    intervals = []
+    for point in intersection_points:
+        distance = math.sqrt(point.x ** 2 + point.y ** 2)  # distance from origin
+        intervals.append((0, distance))
+
     # 6 - build the networkx graph from what you have done before
     # 6.1 - generate "towers" vertices, and assign the coordinates you created before
     # 6.2 - add an edge between vertex v_i and v_j if their Euclidean distance is within the min{r_i, r_j}
+
+    G = nx.Graph()
+    for i in range(0, towers):
+        G.add_node(i, pos=tower_points[i])
+    for i in range(0, towers):
+        for j in range(i + 1, towers):
+            distance = math.sqrt(
+                (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
+            if distance <= min(tower_radii[i], tower_radii[j]):
+                G.add_edge(i, j)
 
     # 0 - IMPORTANT: draw what you are doing. Use matplot lib to draw exactly every previous step I listed.
     #     It will help you to see if you are doing well or not, and also us to guide you in case you need assistance
