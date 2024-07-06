@@ -7,11 +7,11 @@ import problem_gen as problem
 ######################################### HYPER-PARAMETERS #############################################################
 AREA_SIDE = 1000  # [m], it is squared
 TOWERS = 5  # number of towers
-RADIUS_MIN = 100  # [m], for the connectivity
-RADIUS_MAX = 200  # it must be >= RADIUS_MIN
-TRAJECTORIES = 5  # number of trajectories
+RADIUS_MIN = 150  # [m], for the connectivity
+RADIUS_MAX = 320  # it must be >= RADIUS_MIN
+TRAJECTORIES = 1  # number of trajectories
 
-SEED = 1
+SEED = 2
 DEBUG = True
 ########################################################################################################################
 

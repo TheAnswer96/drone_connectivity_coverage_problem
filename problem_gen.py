@@ -1,9 +1,12 @@
+import math
+
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
 from sympy import Polygon, Point
+
 '''
 Write here the code related to problem instances generation
 '''
@@ -44,11 +47,11 @@ def generate_problem_instance(config):
     # 4 - generate "trajectories" trajectories by randomizing two endpoints each, each within 0 and "area_side"
     trajectories_paths = []
     for i in range(0, trajectories):
+        x_0 = random.uniform(0, area_side)
+        y_0 = random.uniform(0, area_side)
         x_1 = random.uniform(0, area_side)
         y_1 = random.uniform(0, area_side)
-        x_2 = random.uniform(0, area_side)
-        y_2 = random.uniform(0, area_side)
-        trajectories_paths.append([(x_1, y_1), (x_2, y_2)])
+        trajectories_paths.append([(x_0, y_0), (x_1, y_1)])
 
 
     # 5 - for each trajectory:
@@ -56,25 +59,29 @@ def generate_problem_instance(config):
 
     intersection_points = []
     for path in trajectories_paths:
+        x_0, y_0 = path[0]
         x_1, y_1 = path[1]
-        x_2, y_2 = path[2]
+
+        intersections = []
         for i in range(0, towers):
             tower_x, tower_y = tower_points[i]
             radius = tower_radii[i]
-            line = sp.Line(sp.Point(x_1, y_1), sp.Point(x_2, y_2))
+            line = sp.Line(sp.Point(x_0, y_0), sp.Point(x_1, y_1))
             circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
-            intersections = line.intersection(circle)
-            if intersections:
-                intersection_points.extend(intersections)
+            ints = line.intersection(circle)
+            if ints:
+                intersections.append((ints, tower_points[i]))
+
+        intersection_points.append(intersections)
 
     # 5.2 - create the intervals. This is difficult. You can imagine this interval as a segment
     #       that goes from 0 (observer) to a certain distance (other endpoint).
     #       From 0, you compute the distance of all the intersection points, and then you can associate the intervals.
 
-    intervals = []
-    for point in intersection_points:
-        distance = math.sqrt(point.x ** 2 + point.y ** 2)  # distance from origin
-        intervals.append((0, distance))
+    # intervals = []
+    # for point in intersection_points:
+    #     distance = math.sqrt(point.x ** 2 + point.y ** 2)  # distance from origin
+    #     intervals.append((0, distance))
 
     # 6 - build the networkx graph from what you have done before
     # 6.1 - generate "towers" vertices, and assign the coordinates you created before
@@ -111,13 +118,31 @@ def generate_problem_instance(config):
         radius = tower_radii[i]
 
         plt.scatter(tower_x, tower_y, marker='o', color='orange')
+        plt.text(tower_x+10, tower_y+10, 'T' + str(i), fontsize=12)
         circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
         plt.gca().add_patch(circle)
 
-    for path in trajectories_paths:
-        x_values = [path[0][0], path[1][0]]
-        y_values = [path[0][1], path[1][1]]
+    for i in range(0, len(trajectories_paths)):
+        x_values = [trajectories_paths[i][0][0], trajectories_paths[i][1][0]]
+        y_values = [trajectories_paths[i][0][1], trajectories_paths[i][1][1]]
+        plt.text(trajectories_paths[i][0][0] + 10, trajectories_paths[i][0][1] + 10, 'P' + str(i), fontsize=12)
         plt.plot(x_values, y_values, marker='o')
+
+    for intersections in intersection_points:
+        for ints in intersections:
+            tower = ints[1]
+            x_values = []
+            y_values = []
+            x_values.append(tower[0])
+            y_values.append(tower[1])
+            for loc_int in ints[0]:
+                x_values.append(loc_int.x)
+                y_values.append(loc_int.y)
+                plt.plot(loc_int.x, loc_int.y, marker='x')
+
+            x_values.append(tower[0])
+            y_values.append(tower[1])
+            plt.plot(x_values, y_values, color='black', linestyle='dashed')
 
     plt.show()
 
