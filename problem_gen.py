@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import sympy as sp
+import math
 from sympy import Polygon, Point
 
 '''
@@ -66,9 +67,9 @@ def generate_problem_instance(config):
         for i in range(0, towers):
             tower_x, tower_y = tower_points[i]
             radius = tower_radii[i]
-            line = sp.Line(sp.Point(x_0, y_0), sp.Point(x_1, y_1))
+            segment = sp.Segment(sp.Point(x_0, y_0), sp.Point(x_1, y_1))
             circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
-            ints = line.intersection(circle)
+            ints = (segment.intersection(circle))
             if ints:
                 intersections.append((ints, tower_points[i]))
 
@@ -111,6 +112,14 @@ def generate_problem_instance(config):
 
     plt.plot(area_x_coords, area_y_coords, marker='o')
     plt.fill(area_x_coords, area_y_coords, alpha=0.05)
+
+    # Plot the Observer and Destination for each trajectory
+    for i in range(0, len(trajectories_paths)):
+        x_0, y_0 = trajectories_paths[i][0]
+        x_1, y_1 = trajectories_paths[i][1]
+        plt.scatter(x_0, y_0, marker='*', color='red', label='Observer')  # Observer
+        plt.scatter(x_1, y_1, marker='D', color='green', label='Destination')  # Destination
+
 
     for i in range(0, towers):
         tower_x = tower_points[i][0]
