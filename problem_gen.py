@@ -21,6 +21,7 @@ def generate_problem_instance(config):
     trajectories = config["trajectories"]
     min_dist_trajectory = config["min_dist_trajectory"]
     scenario = config["scenario"]
+    lattice_neighbors = config["lattice_neighbors"]
     seed = config["seed"]
     debug = config["debug"]
 
@@ -39,7 +40,9 @@ def generate_problem_instance(config):
     tower_radii = []
     G = nx.Graph()
 
-    if scenario == 0:
+    if scenario == -1:
+        tower_points, tower_radii, G = create_test(config)
+    elif scenario == 0:
         print("Not implemented yet!")
         exit(1)
     elif scenario == 1:
@@ -50,6 +53,11 @@ def generate_problem_instance(config):
         tower_points, tower_radii, G = create_regular_manhattan(towers, area_side)
     elif scenario == 4:
         tower_points, tower_radii, G = create_regular_diagonal(towers, area_side)
+    elif scenario == 5:
+        print("Not implemented yet!")
+        exit(1)
+    elif scenario == 6:
+        tower_points, tower_radii, G = create_ring_lattice(towers, lattice_neighbors, area_side)
 
     # 4 - generate "trajectories" trajectories by randomizing two endpoints each, each within 0 and "area_side"
     trajectories_paths = []
@@ -101,13 +109,13 @@ def generate_problem_instance(config):
 
     plt.gca().set_aspect('equal', adjustable='box')
 
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title('Area')
+    # plt.xlabel('X')
+    # plt.ylabel('Y')
+    # plt.title('Area')
     plt.grid(True)
 
-    plt.plot(area_x_coords, area_y_coords, marker='o')
-    plt.fill(area_x_coords, area_y_coords, alpha=0.05)
+    plt.plot(area_x_coords, area_y_coords)
+    plt.fill(area_x_coords, area_y_coords, alpha=0.025)
 
     pos = nx.get_node_attributes(G, 'pos')
     x = [pos[node][0] for node in G.nodes()]
@@ -129,18 +137,19 @@ def generate_problem_instance(config):
         circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
         plt.gca().add_patch(circle)
 
-    # # Plot the Observer and Destination for each trajectory
-    # for i in range(0, len(trajectories_paths)):
-    #     x_0, y_0 = trajectories_paths[i][0]
-    #     x_1, y_1 = trajectories_paths[i][1]
-    #     plt.scatter(x_0, y_0, marker='*', color='red', label='Observer')  # Observer
-    #     plt.scatter(x_1, y_1, marker='D', color='green', label='Destination')  # Destination
+    # Plot the Observer and Destination for each trajectory
+    for i in range(len(trajectories_paths)):
+        x_0, y_0 = trajectories_paths[i][0]
+        x_1, y_1 = trajectories_paths[i][1]
 
-    # for i in range(0, len(trajectories_paths)):
-    #     x_values = [trajectories_paths[i][0][0], trajectories_paths[i][1][0]]
-    #     y_values = [trajectories_paths[i][0][1], trajectories_paths[i][1][1]]
-    #     plt.text(trajectories_paths[i][0][0] + 10, trajectories_paths[i][0][1] + 10, 'P' + str(i), fontsize=12)
-    #     plt.plot(x_values, y_values, marker='o')
+        plt.scatter(x_0, y_0, marker='*', color='red')
+        plt.scatter(x_1, y_1, marker='o', color='green')
+
+        x_values = [x_0, x_1]
+        y_values = [y_0, y_1]
+
+        plt.text(x_0 + 10, y_0 + 10, 'P' + str(i), fontsize=12)
+        plt.plot(x_values, y_values)
 
     # for intersections in intersection_points:
     #     for ints in intersections:
@@ -161,56 +170,75 @@ def generate_problem_instance(config):
     plt.show()
 
 
+def create_test(config):
+    a = 1
+
 def create_RGG_fixed_radius(radius, towers, area_side):
-    # randomly generate "towers" points with x,y coordinates each within 0 and "area_side"
-    tower_points = []
-    for i in range(0, towers):
-        x = random.uniform(0, area_side)
-        y = random.uniform(0, area_side)
-        tower_points.append([x, y])
+    max_attempts = 100
+    att = 0
+    while att < max_attempts:
+        # print(att)
+        tower_points = []
+        for i in range(0, towers):
+            x = random.uniform(0, area_side)
+            y = random.uniform(0, area_side)
+            tower_points.append([x, y])
 
-    # for each tower, generate randomly a radius within "radius_min" and "radius_max"
-    tower_radii = []
-    for i in range(0, towers):
-        tower_radii.append(radius)
+        # for each tower, generate randomly a radius within "radius_min" and "radius_max"
+        tower_radii = []
+        for i in range(0, towers):
+            tower_radii.append(radius)
 
-    G = nx.Graph()
-    for i in range(0, towers):
-        G.add_node(i, pos=tower_points[i])
-    for i in range(0, towers):
-        for j in range(i + 1, towers):
-            distance = math.sqrt(
-                (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
-            if distance <= radius:
-                G.add_edge(i, j)
+        G = nx.Graph()
+        for i in range(0, towers):
+            G.add_node(i, pos=tower_points[i])
+        for i in range(0, towers):
+            for j in range(i + 1, towers):
+                distance = math.sqrt(
+                    (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
+                if distance <= radius:
+                    G.add_edge(i, j)
 
-    return tower_points, tower_radii, G
+        is_connected = nx.is_connected(G)
+
+        if is_connected:
+            return tower_points, tower_radii, G
+
+    print("The graph G is not connected.")
 
 
 def create_RGG_variable_radius(radius_min, radius_max, towers, area_side):
-    tower_points = []
-    for i in range(0, towers):
-        x = random.uniform(0, area_side)
-        y = random.uniform(0, area_side)
-        tower_points.append([x, y])
+    max_attempts = 100
+    att = 0
+    while att < max_attempts:
+        tower_points = []
+        for i in range(0, towers):
+            x = random.uniform(0, area_side)
+            y = random.uniform(0, area_side)
+            tower_points.append([x, y])
 
-    # for each tower, generate randomly a radius within "radius_min" and "radius_max"
-    tower_radii = []
-    for i in range(0, towers):
-        radius = random.uniform(radius_min, radius_max)
-        tower_radii.append(radius)
+        # for each tower, generate randomly a radius within "radius_min" and "radius_max"
+        tower_radii = []
+        for i in range(0, towers):
+            radius = random.uniform(radius_min, radius_max)
+            tower_radii.append(radius)
 
-    G = nx.Graph()
-    for i in range(0, towers):
-        G.add_node(i, pos=tower_points[i])
-    for i in range(0, towers):
-        for j in range(i + 1, towers):
-            distance = math.sqrt(
-                (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
-            if distance <= min(tower_radii[i], tower_radii[j]):
-                G.add_edge(i, j)
+        G = nx.Graph()
+        for i in range(0, towers):
+            G.add_node(i, pos=tower_points[i])
+        for i in range(0, towers):
+            for j in range(i + 1, towers):
+                distance = math.sqrt(
+                    (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
+                if distance <= min(tower_radii[i], tower_radii[j]):
+                    G.add_edge(i, j)
 
-    return tower_points, tower_radii, G
+        is_connected = nx.is_connected(G)
+
+        if is_connected:
+            return tower_points, tower_radii, G
+
+    print("The graph G is not connected.")
 
 
 def create_regular_manhattan(towers, area_side):
@@ -251,6 +279,41 @@ def create_regular_diagonal(towers, area_side):
 
     tower_radii = []
     radius = gap*math.sqrt(2)
+    for i in range(0, towers):
+        tower_radii.append(radius)
+
+    G = nx.Graph()
+    for i in range(0, towers):
+        G.add_node(i, pos=tower_points[i])
+    for i in range(0, towers):
+        for j in range(i + 1, towers):
+            distance = math.sqrt(
+                (tower_points[i][0] - tower_points[j][0]) ** 2 + (tower_points[i][1] - tower_points[j][1]) ** 2)
+            if distance <= radius:
+                G.add_edge(i, j)
+
+    return tower_points, tower_radii, G
+
+
+def create_ring_lattice(towers, lattice_neighbors, area_side):
+    r = area_side / 2
+    center_x = area_side / 2
+    center_y = area_side / 2
+
+    angle_step = 2 * math.pi / towers
+
+    tower_points = []
+
+    for i in range(towers):
+        angle = i * angle_step
+        x = center_x + r * math.cos(angle)
+        y = center_y + r * math.sin(angle)
+        tower_points.append((x, y))
+
+    side_length = 2 * r * math.sin(math.pi / towers) + 5
+    radius = side_length * (lattice_neighbors / 2)
+
+    tower_radii = []
     for i in range(0, towers):
         tower_radii.append(radius)
 
