@@ -47,7 +47,7 @@ AREA_SIDE = 1000
 #      TOWERS must be >= 3 (if not, it is adjusted to 3)
 #      is connected
 #      can't be fully covered
-SCENARIO = 1
+SCENARIO = -1
 
 TOWERS = 5
 
