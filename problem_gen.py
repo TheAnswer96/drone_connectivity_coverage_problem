@@ -78,12 +78,10 @@ def generate_problem_instance(config):
 
     if scenario == -1:
         trajectories_paths = []
-        trajectories_paths.append([(50, 305), (975, 100)])
+        trajectories_paths.append([(120, 305), (975, 100)])
         trajectories_paths.append([(0, 449.999), (1000, 450)])
 
-    # Intersections
-    # Intersection points among it and all the towers
-
+    # Intersections + Intervals
     intersection_points = []
     for path in trajectories_paths:
         x_0, y_0 = path[0]
@@ -115,17 +113,7 @@ def generate_problem_instance(config):
 
         intersection_points.append(intersections)
 
-    # 5.2 - create the intervals. This is difficult. You can imagine this interval as a segment
-    #       that goes from 0 (observer) to a certain distance (other endpoint).
-    #       From 0, you compute the distance of all the intersection points, and then you can associate the intervals.
-
-    # 6 - build the networkx graph from what you have done before
-    # 6.1 - generate "towers" vertices, and assign the coordinates you created before
-    # 6.2 - add an edge between vertex v_i and v_j if their Euclidean distance is within the min{r_i, r_j}
-
-    # 0 - IMPORTANT: draw what you are doing. Use matplot lib to draw exactly every previous step I listed.
-    #     It will help you to see if you are doing well or not, and also us to guide you in case you need assistance
-
+    # Plot
     plt.figure(figsize=(8, 8))
     plt.gca().set_aspect('equal', adjustable='box')
     plt.grid(True)
@@ -216,7 +204,7 @@ def generate_problem_instance(config):
 
             print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
 
-            plt.plot(x_values, y_values, color='blue', linestyle='dashed')
+            plt.plot(x_values, y_values, color='blue', linestyle='dashed', linewidth=0.7)
 
         print()
 
@@ -237,10 +225,10 @@ def create_test(config):
 
     tower_points = []
     tower_points.append([200, 200])
-    tower_points.append([550, 200])
+    tower_points.append([550, 140])
     tower_points.append([900, 200])
-    tower_points.append([350, 300])
-    tower_points.append([750, 300])
+    tower_points.append([300, 300])
+    tower_points.append([750, 250])
 
     tower_radii = []
     tower_radii.append(150)

@@ -15,7 +15,7 @@ AREA_SIDE = 1000
 # -1 - Test (fixed)
 
 #  0 - Complete graph
-#      ????
+#      ???? (set cover problem, trivial)
 
 #  1 - RGG with fixed r
 #      considers only RADIUS_MIN
@@ -47,9 +47,9 @@ AREA_SIDE = 1000
 #      TOWERS must be >= 3 (if not, it is adjusted to 3)
 #      is connected
 #      can't be fully covered
-SCENARIO = -1
+SCENARIO = 6
 
-TOWERS = 5
+TOWERS = 12
 
 RADIUS_MIN = 250
 
@@ -57,9 +57,9 @@ RADIUS_MIN = 250
 RADIUS_MAX = 350
 
 # it must be >= 2, even, and <= TOWERS/2
-LATTICE_NEIGHBORS = 10
+LATTICE_NEIGHBORS = 6
 
-TRAJECTORIES = 5
+TRAJECTORIES = 2
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 700
