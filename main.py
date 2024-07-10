@@ -51,15 +51,15 @@ SCENARIO = -1
 
 TOWERS = 5
 
-RADIUS_MIN = 300
+RADIUS_MIN = 250
 
 # it must be >= RADIUS_MIN
 RADIUS_MAX = 350
 
 # it must be >= 2, even, and <= TOWERS/2
-LATTICE_NEIGHBORS = 4
+LATTICE_NEIGHBORS = 10
 
-TRAJECTORIES = 2
+TRAJECTORIES = 5
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 700

@@ -79,7 +79,7 @@ def generate_problem_instance(config):
     if scenario == -1:
         trajectories_paths = []
         trajectories_paths.append([(50, 305), (975, 100)])
-        # trajectories_paths.append([(0, 400), (1000, 400)])
+        trajectories_paths.append([(0, 449.999), (1000, 450)])
 
     # Intersections
     # Intersection points among it and all the towers
@@ -105,8 +105,11 @@ def generate_problem_instance(config):
                 else:
                     if p0.distance(circle.center) < circle.radius:
                         ints.append(p0)
-                    else:
+                    elif p1.distance(circle.center) < circle.radius:
                         ints.append(p1)
+                    else:
+                        # Tangent case, empty interval, so skip
+                        break
 
                     intersections.append((ints, i))
 
@@ -176,7 +179,7 @@ def generate_problem_instance(config):
         x_0, y_0 = trajectories_paths[i][0]
         x_1, y_1 = trajectories_paths[i][1]
         dist = get_distance((x_0, y_0), (x_1, y_1))
-        print("P%d = [0, %d]" % (i, dist))
+        print("P%d = [0, %.2f]" % (i, dist))
         # print(" S=(%.2f, %.2f)" % (x_0, y_0))
         # print(" D=(%.2f, %.2f)" % (x_1, y_1))
 
@@ -211,9 +214,9 @@ def generate_problem_instance(config):
             # print(dist_i1)
             plt.plot(i1x, i1y, marker='x')
 
-            print("  I = T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
+            print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
 
-            plt.plot(x_values, y_values, color='red', linestyle='dashed')
+            plt.plot(x_values, y_values, color='blue', linestyle='dashed')
 
         print()
 
