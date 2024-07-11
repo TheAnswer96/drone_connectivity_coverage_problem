@@ -10,10 +10,6 @@ from sympy import Polygon, Point
 
 from util import get_distance
 
-'''
-Write here the code related to problem instances generation
-'''
-
 
 def generate_problem_instance(config):
     area_side = config["area_side"]
@@ -61,45 +57,43 @@ def generate_problem_instance(config):
     elif scenario == 6:
         tower_points, tower_radii, G = create_ring_lattice(towers, lattice_neighbors, area_side)
 
+
+    # if scenario == -1:
+    #     trajectories_paths = []
+    #     trajectories_paths.append([(120, 305), (975, 100)])
+    #     trajectories_paths.append([(0, 449.999), (1000, 450)])
+
     # Trajectories
     trajectories_paths = []
+    intervals = []
+    intersection_points = []
     i = 0
     while i < trajectories:
+        # Generate first the trajectory
         x_0 = random.uniform(0, area_side)
         y_0 = random.uniform(0, area_side)
         x_1 = random.uniform(0, area_side)
         y_1 = random.uniform(0, area_side)
         dist = math.sqrt((x_1 - x_0) ** 2 + (y_1 - y_0) ** 2)
+
+        # If short, discard
         if dist < min_dist_trajectory:
             continue
 
-        trajectories_paths.append([(x_0, y_0), (x_1, y_1)])
-        i = i + 1
-
-    if scenario == -1:
-        trajectories_paths = []
-        trajectories_paths.append([(120, 305), (975, 100)])
-        trajectories_paths.append([(0, 449.999), (1000, 450)])
-
-    # Intersections + Intervals
-    intersection_points = []
-    for path in trajectories_paths:
-        x_0, y_0 = path[0]
-        x_1, y_1 = path[1]
-
+        # Calculate intersections
         p0 = sp.Point(x_0, y_0)
         p1 = sp.Point(x_1, y_1)
 
         intersections = []
-        for i in range(0, towers):
-            tower_x, tower_y = tower_points[i]
-            radius = tower_radii[i]
+        for j in range(0, towers):
+            tower_x, tower_y = tower_points[j]
+            radius = tower_radii[j]
             segment = sp.Segment(p0, p1)
             circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
             ints = (segment.intersection(circle))
             if ints:
                 if len(ints) == 2:
-                    intersections.append((ints, i))
+                    intersections.append((ints, j))
                 else:
                     if p0.distance(circle.center) < circle.radius:
                         ints.append(p0)
@@ -109,106 +103,149 @@ def generate_problem_instance(config):
                         # Tangent case, empty interval, so skip
                         break
 
-                    intersections.append((ints, i))
+                    intersections.append((ints, j))
 
-        intersection_points.append(intersections)
-
-    # Plot
-    plt.figure(figsize=(8, 8))
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.grid(True)
-
-    plt.xlim([0, area_side])
-    plt.ylim([0, area_side])
-    plt.tight_layout()
-
-    # Area
-    plt.plot(area_x_coords, area_y_coords)
-    plt.fill(area_x_coords, area_y_coords, alpha=0.025)
-
-    # Towers + connectivity + coverage
-    pos = nx.get_node_attributes(G, 'pos')
-    x = [pos[node][0] for node in G.nodes()]
-    y = [pos[node][1] for node in G.nodes()]
-    plt.scatter(x, y, color='orange')
-    for edge in G.edges():
-        x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
-        y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
-        plt.plot(x_coords, y_coords, color='black')
-
-    for node, (x_coord, y_coord) in pos.items():
-        plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
-
-    for i in range(0, towers):
-        tower_x = tower_points[i][0]
-        tower_y = tower_points[i][1]
-        radius = tower_radii[i]
-
-        circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
-        plt.gca().add_patch(circle)
-
-    # Trajectories
-    for i in range(len(trajectories_paths)):
-        x_0, y_0 = trajectories_paths[i][0]
-        x_1, y_1 = trajectories_paths[i][1]
-
-        plt.scatter(x_0, y_0, marker='*', color='red')
-        plt.scatter(x_1, y_1, marker='o', color='green')
-
-        x_values = [x_0, x_1]
-        y_values = [y_0, y_1]
-
-        plt.text(x_0 + 10, y_0 + 10, 'P' + str(i), fontsize=12)
-        plt.plot(x_values, y_values)
-
-    # Intersections
-    for i in range(0, len(intersection_points)):
-        intersections = intersection_points[i]
-        x_0, y_0 = trajectories_paths[i][0]
-        x_1, y_1 = trajectories_paths[i][1]
+        # Evaluate if it is fully covered
         dist = get_distance((x_0, y_0), (x_1, y_1))
-        print("P%d = [0, %.2f]" % (i, dist))
-        # print(" S=(%.2f, %.2f)" % (x_0, y_0))
-        # print(" D=(%.2f, %.2f)" % (x_1, y_1))
-
+        # print("P%d = [0, %.2f]" % (i, dist))
+        path_intervals = []
         for j in range(0, len(intersections)):
             ints = intersections[j]
             tower_id = ints[1]
-            x_values = []
-            y_values = []
-            # print("  I -> T%d" % tower_id)
 
             i0x = ints[0][0].x
             i0y = ints[0][0].y
             i1x = ints[0][1].x
             i1y = ints[0][1].y
-            tx = tower_points[tower_id][0]
-            ty = tower_points[tower_id][1]
-
-            x_values.append(i0x)
-            y_values.append(i0y)
-            # print("   (%.2f, %.2f)" % (i0x, i0y))
             dist_i0 = get_distance((x_0, y_0), (i0x, i0y))
-            # print(dist_i0)
-            plt.plot(i0x, i0y, marker='x')
-
-            x_values.append(tx)
-            y_values.append(ty)
-
-            x_values.append(i1x)
-            y_values.append(i1y)
-            # print("   (%.2f, %.2f)" % (i1x, i1y))
             dist_i1 = get_distance((x_0, y_0), (i1x, i1y))
-            # print(dist_i1)
-            plt.plot(i1x, i1y, marker='x')
 
-            print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
+            interval = {
+                "tower": tower_id,
+                "inf": min(dist_i0, dist_i1),
+                "sup": max(dist_i0, dist_i1),
+            }
+            path_intervals.append(interval)
 
-            plt.plot(x_values, y_values, color='blue', linestyle='dashed', linewidth=0.7)
+            # print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
 
-        print()
+        covered = is_covered(dist, path_intervals)
+        # If not covered, discard
+        if not covered:
+            continue
 
-    plt.show()
+        intersection_points.append(intersections)
+        out_int = {
+            "length": dist,
+            "interval": path_intervals
+        }
+        intervals.append(out_int)
+
+        trajectories_paths.append([(x_0, y_0), (x_1, y_1)])
+        i = i + 1
+
+    if debug:
+        # Plot
+        plt.figure(figsize=(10, 10))
+        plt.gca().set_aspect('equal', adjustable='box')
+        plt.grid(True)
+
+        plt.xlim([0, area_side])
+        plt.ylim([0, area_side])
+        plt.tight_layout()
+
+        # Area
+        plt.plot(area_x_coords, area_y_coords)
+        plt.fill(area_x_coords, area_y_coords, alpha=0.025)
+
+        # Towers + connectivity + coverage
+        pos = nx.get_node_attributes(G, 'pos')
+        x = [pos[node][0] for node in G.nodes()]
+        y = [pos[node][1] for node in G.nodes()]
+        plt.scatter(x, y, color='orange')
+        for edge in G.edges():
+            x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
+            y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
+            plt.plot(x_coords, y_coords, color='black')
+
+        for node, (x_coord, y_coord) in pos.items():
+            plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
+
+        for i in range(0, towers):
+            tower_x = tower_points[i][0]
+            tower_y = tower_points[i][1]
+            radius = tower_radii[i]
+
+            circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
+            plt.gca().add_patch(circle)
+
+        # Trajectories
+        for i in range(len(trajectories_paths)):
+            x_0, y_0 = trajectories_paths[i][0]
+            x_1, y_1 = trajectories_paths[i][1]
+
+            plt.scatter(x_0, y_0, marker='*', color='red')
+            plt.scatter(x_1, y_1, marker='o', color='green')
+
+            x_values = [x_0, x_1]
+            y_values = [y_0, y_1]
+
+            plt.text(x_0 + 10, y_0 + 10, 'P' + str(i), fontsize=12)
+            plt.plot(x_values, y_values)
+
+        # Intersections
+        for i in range(0, len(intersection_points)):
+            intersections = intersection_points[i]
+            x_0, y_0 = trajectories_paths[i][0]
+            x_1, y_1 = trajectories_paths[i][1]
+            dist = get_distance((x_0, y_0), (x_1, y_1))
+            # print("P%d = [0, %.2f]" % (i, dist))
+            # print(" S=(%.2f, %.2f)" % (x_0, y_0))
+            # print(" D=(%.2f, %.2f)" % (x_1, y_1))
+
+            for j in range(0, len(intersections)):
+                ints = intersections[j]
+                tower_id = ints[1]
+                x_values = []
+                y_values = []
+                # print("  I -> T%d" % tower_id)
+
+                i0x = ints[0][0].x
+                i0y = ints[0][0].y
+                i1x = ints[0][1].x
+                i1y = ints[0][1].y
+                tx = tower_points[tower_id][0]
+                ty = tower_points[tower_id][1]
+
+                x_values.append(i0x)
+                y_values.append(i0y)
+                # print("   (%.2f, %.2f)" % (i0x, i0y))
+                dist_i0 = get_distance((x_0, y_0), (i0x, i0y))
+                # print(dist_i0)
+                plt.plot(i0x, i0y, marker='x')
+
+                x_values.append(tx)
+                y_values.append(ty)
+
+                x_values.append(i1x)
+                y_values.append(i1y)
+                # print("   (%.2f, %.2f)" % (i1x, i1y))
+                dist_i1 = get_distance((x_0, y_0), (i1x, i1y))
+                # print(dist_i1)
+                plt.plot(i1x, i1y, marker='x')
+
+                # print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
+
+                plt.plot(x_values, y_values, color='blue', linestyle='dashed', linewidth=0.7)
+
+        plt.show()
+
+    output = {
+        "graph": G,
+        "intervals" : intervals
+    }
+
+    return output
 
 
 def create_test(config):
@@ -249,10 +286,44 @@ def create_test(config):
 
     return tower_points, tower_radii, G
 
+
+def is_covered(dist, intervals):
+    EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
+
+    # Step 1: Extract and sort intervals based on "inf" and "sup"
+    sorted_intervals = sorted(intervals, key=lambda x: (x["inf"], x["sup"]))
+
+    # Step 2: Merge overlapping and contiguous intervals
+    min_inf = sorted_intervals[0]["inf"]
+    max_sup = sorted_intervals[0]["sup"]
+
+    for i in range(1, len(sorted_intervals)):
+
+        # There is a gap immediately, so exit
+        if min_inf > EPSILON:
+            return False
+
+        inf = sorted_intervals[i]["inf"]
+        sup = sorted_intervals[i]["sup"]
+
+        if inf - max_sup > EPSILON:
+            # There is a gap, so exit
+            return False
+        else:
+            max_sup = max(max_sup, sup)
+
+    if dist - max_sup > EPSILON:
+        # There is a gap at the end, so exit
+        return False
+
+    return True
+
+
 def create_RGG_fixed_radius(radius, towers, area_side):
-    max_attempts = 100
+    max_attempts = 1000
     att = 0
     while att < max_attempts:
+        # print("Attempt n %d" % att)
         # print(att)
         tower_points = []
         for i in range(0, towers):
@@ -278,13 +349,17 @@ def create_RGG_fixed_radius(radius, towers, area_side):
         is_connected = nx.is_connected(G)
 
         if is_connected:
+            print("Attempt: %d - The graph G is connected." % att)
             return tower_points, tower_radii, G
+        else:
+            att = att+1
 
     print("The graph G is not connected.")
+    exit(-1)
 
 
 def create_RGG_variable_radius(radius_min, radius_max, towers, area_side):
-    max_attempts = 100
+    max_attempts = 1000
     att = 0
     while att < max_attempts:
         tower_points = []
@@ -312,7 +387,10 @@ def create_RGG_variable_radius(radius_min, radius_max, towers, area_side):
         is_connected = nx.is_connected(G)
 
         if is_connected:
+            print("Attempt: %d - The graph G is connected." % att)
             return tower_points, tower_radii, G
+        else:
+            att = att+1
 
     print("The graph G is not connected.")
 
