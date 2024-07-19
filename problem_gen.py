@@ -8,7 +8,7 @@ import sympy as sp
 import math
 from sympy import Polygon, Point
 
-from util import get_distance
+from util import get_distance, EPSILON
 
 
 def generate_problem_instance(config):
@@ -314,8 +314,6 @@ def create_test(config):
 
 
 def is_covered(dist, intervals):
-    EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
-
     if len(intervals) == 0:
         return False
 

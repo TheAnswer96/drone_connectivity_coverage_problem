@@ -1,5 +1,7 @@
 import math
 
+EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
+
 
 def is_square(n):
     if n < 0:
@@ -7,6 +9,10 @@ def is_square(n):
 
     root = math.isqrt(n)
     return root * root == n
+
+
+def is_zero(value):
+    return abs(value) < EPSILON
 
 
 def get_distance(p0, p1):
