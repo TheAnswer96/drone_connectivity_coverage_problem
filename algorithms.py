@@ -42,8 +42,21 @@ def single_minimum_k_coverage(instance):
     return output
 
 
+def create_instance_set_cover(instance):
+    G = instance["graph"]
+    intervals = instance["intervals"]
+    for interval in intervals:
+        length = interval["length"]
+        print(" Length=%.2f" % length)
+        for I in interval["interval"]:
+            tower = I["tower"]
+            inf = I["inf"]
+            sup = I["sup"]
+            print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
+
+
 def multiple_minimum_eccentricity_opt(instance):
-    # TODO
+    new_instance = create_instance_set_cover(instance)
 
     output = {
         "result": -1

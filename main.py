@@ -47,12 +47,12 @@ AREA_SIDE = 1000
 #      can't be fully covered
 SCENARIO = 1
 
-TOWERS = 25
+TOWERS = 5
 
-RADIUS_MIN = 200
+RADIUS_MIN = 300
 
 # it must be >= RADIUS_MIN
-RADIUS_MAX = 350
+RADIUS_MAX = 700
 
 # it must be >= 2, even, and <= TOWERS/2
 LATTICE_NEIGHBORS = 2
@@ -106,25 +106,25 @@ if __name__ == '__main__':
     # Result of the random instance
     G = instance["graph"]
     intervals = instance["intervals"]
-    print("There are %d trajectories" % len(intervals))
-    for interval in intervals:
-        length = interval["length"]
-        print(" Length=%.2f" % length)
-        for I in interval["interval"]:
-            tower = I["tower"]
-            inf = I["inf"]
-            sup = I["sup"]
-            print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
+    # print("There are %d trajectories" % len(intervals))
+    # for interval in intervals:
+    #     length = interval["length"]
+    #     print(" Length=%.2f" % length)
+    #     for I in interval["interval"]:
+    #         tower = I["tower"]
+    #         inf = I["inf"]
+    #         sup = I["sup"]
+    #         print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
 
     # Algorithms
     # MEP
-    output1 = single_minimum_eccentricity(instance)
+    # output1 = single_minimum_eccentricity(instance)
 
     # MTCP
-    output2 = single_minimum_coverage(instance)
+    # output2 = single_minimum_coverage(instance)
 
     # MEP-k ??
-    output3 = single_minimum_k_coverage(instance)
+    # output3 = single_minimum_k_coverage(instance)
 
     # MEPT
     output4 = multiple_minimum_eccentricity_opt(instance)

@@ -130,6 +130,7 @@ def generate_problem_instance(config):
 
             # print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
 
+        path_intervals = sorted(path_intervals, key=lambda x: (x["inf"], x["sup"]))
         covered = is_covered(dist, path_intervals)
 
         # If not covered, discard
@@ -314,6 +315,9 @@ def create_test(config):
 
 def is_covered(dist, intervals):
     EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
+
+    if len(intervals) == 0:
+        return False
 
     # Step 1: Extract and sort intervals based on "inf" and "sup"
     sorted_intervals = sorted(intervals, key=lambda x: (x["inf"], x["sup"]))
