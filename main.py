@@ -117,10 +117,16 @@ if __name__ == '__main__':
             print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
 
     # Algorithms
+    # MEP
     output1 = single_minimum_eccentricity(instance)
 
+    # MTCP
     output2 = single_minimum_coverage(instance)
 
+    # MEP-k ??
     output3 = single_minimum_k_coverage(instance)
 
-    output4 = multiple_minimum_eccentricity(instance)
+    # MEPT
+    output4 = multiple_minimum_eccentricity_opt(instance)
+    output5 = multiple_minimum_eccentricity_v1(instance)
+    output6 = multiple_minimum_eccentricity_v2(instance)
