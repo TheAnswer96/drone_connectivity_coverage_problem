@@ -57,11 +57,12 @@ def generate_problem_instance(config):
     elif scenario == 6:
         tower_points, tower_radii, G = create_ring_lattice(towers, lattice_neighbors, area_side)
 
-
     # if scenario == -1:
     #     trajectories_paths = []
     #     trajectories_paths.append([(120, 305), (975, 100)])
     #     trajectories_paths.append([(0, 449.999), (1000, 450)])
+
+    dummy = set()
 
     # Trajectories
     trajectories_paths = []
@@ -130,9 +131,32 @@ def generate_problem_instance(config):
             # print("  T%d - [%.2f, %.2f]" % (tower_id, min(dist_i0, dist_i1), max(dist_i0, dist_i1)))
 
         covered = is_covered(dist, path_intervals)
+
         # If not covered, discard
         if not covered:
             continue
+
+        # Add two dummy nodes
+        s_node = "S%d" % i
+        d_node = "D%d" % i
+        G.add_node(s_node)
+        G.add_node(d_node)
+        dummy.add(s_node)
+        dummy.add(d_node)
+
+        # Add dummy edges
+        for j in range(0, towers):
+            tower_x, tower_y = tower_points[j]
+            radius = tower_radii[j]
+
+            dist_i0j = get_distance((x_0, y_0), (tower_x, tower_y))
+            dist_i1j = get_distance((x_1, y_1), (tower_x, tower_y))
+
+            if dist_i0j <= radius:
+                G.add_edge(s_node, j)
+
+            if dist_i1j <= radius:
+                G.add_edge(d_node, j)
 
         intersection_points.append(intersections)
         out_int = {
@@ -160,13 +184,14 @@ def generate_problem_instance(config):
 
         # Towers + connectivity + coverage
         pos = nx.get_node_attributes(G, 'pos')
-        x = [pos[node][0] for node in G.nodes()]
-        y = [pos[node][1] for node in G.nodes()]
+        x = [pos[node][0] for node in G.nodes() if node not in dummy]
+        y = [pos[node][1] for node in G.nodes() if node not in dummy]
         plt.scatter(x, y, color='orange')
         for edge in G.edges():
-            x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
-            y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
-            plt.plot(x_coords, y_coords, color='black')
+            if edge[0] not in dummy and edge[1] not in dummy:
+                x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
+                y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
+                plt.plot(x_coords, y_coords, color='black')
 
         for node, (x_coord, y_coord) in pos.items():
             plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
