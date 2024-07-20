@@ -48,9 +48,8 @@ def single_minimum_k_coverage(instance):
 def create_instance_set_cover(intervals):
     i = 0
     for interval in intervals:
-        print(f"Trajectory_{i}")
         length = interval["length"]
-        print(f"Length={length:.2f}")
+        print(f"Trajectory T_{i} with interval [0, {length:.2f}] and {len(interval["interval"])} towers")
         endpoints = []
         for I in interval["interval"]:
             tower = I["tower"]
@@ -79,8 +78,10 @@ def create_instance_set_cover(intervals):
 
         j = 0
         mini_intervals = []
+        print(f"The whole interval can be split into {len(segments)} mini intervals")
         for start, end, active_towers in segments:
-            print(f"I_{i}^{j} -> [{start:.2f}, {end:.2f}]: Towers {active_towers}")
+            # print(f"  I_{i}^{j} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
+            print(f"  I_{(i, j)} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
             mini_interval = {
                 "subscript": i,
                 "superscript": j,
@@ -90,6 +91,8 @@ def create_instance_set_cover(intervals):
             }
             mini_intervals.append(mini_interval)
             j = j + 1
+
+        print(f"The whole interval can be split as follows")
 
         for I in interval["interval"]:
             tower = I["tower"]
@@ -108,9 +111,9 @@ def create_instance_set_cover(intervals):
             inf = I["inf"]
             sup = I["sup"]
             mini = I["mini"]
-            print(f"  I_{tower} [{inf:.2f}, {sup:.2f}] -> ")
-            for subscript, superscript in mini:
-                print(f"      I_{subscript}^{superscript}")
+            print(f"  I_{tower} [{inf:.2f}, {sup:.2f}] -> {mini}")
+            # for subscript, superscript in mini:
+            #     print(f"      I_{subscript}^{superscript}")
 
         # Next iteration
         i = i + 1

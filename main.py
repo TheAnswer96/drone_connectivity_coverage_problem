@@ -57,7 +57,7 @@ RADIUS_MAX = 700
 # it must be >= 2, even, and <= TOWERS/2
 LATTICE_NEIGHBORS = 2
 
-TRAJECTORIES = 3
+TRAJECTORIES = 2
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
