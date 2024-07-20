@@ -125,6 +125,7 @@ def generate_problem_instance(config):
                 "tower": tower_id,
                 "inf": min(dist_i0, dist_i1),
                 "sup": max(dist_i0, dist_i1),
+                "mini": []
             }
             path_intervals.append(interval)
 
@@ -268,7 +269,7 @@ def generate_problem_instance(config):
 
     output = {
         "graph": G,
-        "intervals" : intervals
+        "intervals": intervals
     }
 
     return output
@@ -323,6 +324,13 @@ def is_covered(dist, intervals):
     # Step 2: Merge overlapping and contiguous intervals
     min_inf = sorted_intervals[0]["inf"]
     max_sup = sorted_intervals[0]["sup"]
+
+    # Do this when there is only one interval
+    if len(intervals) == 1:
+        if dist - max_sup > EPSILON:
+            return False
+        if min_inf > EPSILON:
+            return False
 
     for i in range(1, len(sorted_intervals)):
 
