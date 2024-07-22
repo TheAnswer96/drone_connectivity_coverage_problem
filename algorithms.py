@@ -49,7 +49,7 @@ def create_instance_set_cover(intervals):
     i = 0
     for interval in intervals:
         length = interval["length"]
-        print(f"Trajectory T_{i} with interval [0, {length:.2f}] and {len(interval["interval"])} towers")
+        print(f"Trajectory T_{i} with interval [0, {length:.2f}] and {len(interval['interval'])} towers")
         endpoints = []
         for I in interval["interval"]:
             tower = I["tower"]
