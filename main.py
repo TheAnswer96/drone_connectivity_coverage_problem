@@ -118,8 +118,8 @@ if __name__ == '__main__':
 
     # Algorithms
     # MEP
-    # output1 = single_minimum_eccentricity(instance)
-
+    output1 = single_minimum_eccentricity(instance)
+    print(output1)
     # MTCP
     # output2 = single_minimum_coverage(instance)
 
@@ -127,6 +127,6 @@ if __name__ == '__main__':
     # output3 = single_minimum_k_coverage(instance)
 
     # MEPT
-    output4 = multiple_minimum_eccentricity_opt(instance)
-    output5 = multiple_minimum_eccentricity_v1(instance)
-    output6 = multiple_minimum_eccentricity_v2(instance)
+    # output4 = multiple_minimum_eccentricity_opt(instance)
+    # output5 = multiple_minimum_eccentricity_v1(instance)
+    # output6 = multiple_minimum_eccentricity_v2(instance)

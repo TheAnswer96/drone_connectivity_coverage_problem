@@ -1,9 +1,14 @@
-from util import is_zero
-
+from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover
+import networkx as nx
+import matplotlib.pyplot as plt
 
 def single_minimum_eccentricity(instance):
+    print("Algorithm Single Scenario: MEP\n")
+    outputs = []
     # Result of the random instance
     G = instance["graph"]
+    nx.draw(G)
+    plt.show()
     intervals = instance["intervals"]
     print("There are %d trajectories" % len(intervals))
     for interval in intervals:
@@ -14,15 +19,32 @@ def single_minimum_eccentricity(instance):
             inf = I["inf"]
             sup = I["sup"]
             print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
+    print("")
+    # create_instance_set_cover(instance["intervals"])
+    for i in range(len(intervals)):
+        sol = {"eccentricity": -1, "used_intervals": []}
+        source = "S"+str(i)
+        length = round(intervals[i]["length"], 2)
+        ecc = nx.eccentricity(G, source)
+        depth = 1
+        while depth < ecc:
+            bfs_tree = nx.bfs_tree(G, source, depth_limit=depth)
+            bfs_nodes = bfs_tree.nodes()
+            print("distance: ", depth)
+            print("nodes in connectivity graph: ", bfs_nodes)
+            cover, coverage = is_coverage(intervals[i], set(bfs_nodes))
+            print("*Exists feasible coverage: ", cover, "\n")
+            if cover:
+                sol = {
+                    "eccentricity": depth,
+                    "used_intervals": get_minimum_cover(coverage, length),
+                }
+                break
+            depth = depth + 1
+        output = {"trajectory": i, "solution": sol}
+        outputs.append(output)
 
-    # TODO
-
-    output = {
-        "eccentricity": -1,
-        "used_intervals": [1, 2, 3],
-    }
-
-    return output
+    return outputs
 
 
 def single_minimum_coverage(instance):
