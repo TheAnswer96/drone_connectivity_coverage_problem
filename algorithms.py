@@ -28,7 +28,7 @@ def single_minimum_eccentricity(instance):
         length = round(intervals[i]["length"], 2)
         ecc = nx.eccentricity(G, source)
         depth = 1
-        while depth < ecc:
+        while depth <= ecc:
             bfs_tree = nx.bfs_tree(G, source, depth_limit=depth)
             bfs_nodes = bfs_tree.nodes()
             print("distance: ", depth)
@@ -68,7 +68,7 @@ def single_minimum_k_coverage(instance):
     return output
 
 
-def create_instance_set_cover(intervals):
+def create_instance_set_cover(intervals, bfs_nodes):
     i = 0
     for interval in intervals:
         length = interval["length"]
@@ -76,6 +76,9 @@ def create_instance_set_cover(intervals):
         endpoints = []
         for I in interval["interval"]:
             tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
             inf = I["inf"]
             sup = I["sup"]
             endpoints.append((inf, 'start', tower))
@@ -119,6 +122,8 @@ def create_instance_set_cover(intervals):
 
         for I in interval["interval"]:
             tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
 
             for mini_interval in mini_intervals:
                 active_towers = mini_interval["active_towers"]
@@ -131,6 +136,9 @@ def create_instance_set_cover(intervals):
 
         for I in interval["interval"]:
             tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
             inf = I["inf"]
             sup = I["sup"]
             mini = I["mini"]
@@ -143,17 +151,14 @@ def create_instance_set_cover(intervals):
 
         print()
 
-    return intervals
-
-
-def multiple_minimum_eccentricity_opt(instance):
-    G = instance["graph"]
-    intervals = create_instance_set_cover(instance["intervals"])
-
     universe = set()
     collection = []
     for interval in intervals:
         for I in interval["interval"]:
+            tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
             mini = I["mini"]
             tmp = set()
             for m in mini:
@@ -162,15 +167,66 @@ def multiple_minimum_eccentricity_opt(instance):
 
             collection.append(tmp)
 
+    return universe, collection
+
+
+def multiple_minimum_eccentricity_opt(instance):
+    G = instance["graph"]
+    intervals = instance["intervals"]
+
+    # Determine the min d to cover all trajectories TODO
+    # new_intervals is a subset of intervals
+    min_d_vec = []
+    bfs_nodes_vec = []
+    for i in range(len(intervals)):
+        source = "S" + str(i)
+        # length = round(intervals[i]["length"], 2)
+        ecc = nx.eccentricity(G, source)
+        depth = 1
+        while depth <= ecc:
+            bfs_tree = nx.bfs_tree(G, source, depth_limit=depth)
+            bfs_nodes = bfs_tree.nodes()
+            # print("distance: ", depth)
+            # print("nodes in connectivity graph: ", bfs_nodes)
+            cover, coverage = is_coverage(intervals[i], set(bfs_nodes))
+            # print("*Exists feasible coverage: ", cover, "\n")
+            if cover:
+                min_d_vec.append(depth)
+                bfs_nodes_vec.append(bfs_nodes)
+                break
+            depth = depth + 1
+
+    # print(min_d_vec)
+    max_min_d = max(min_d_vec)
+    print(f"The minimum d to cover all trajectories is {max_min_d}")
+    bfs_nodes = set()
+    for nodes in bfs_nodes_vec:
+        for node in nodes:
+            if isinstance(node, int):
+                bfs_nodes.add(node)
+
+    graph_nodes = set()
+    for node in G.nodes():
+        if isinstance(node, int):
+            graph_nodes.add(node)
+
+    diff_nodes = graph_nodes - bfs_nodes
+    print(f"Towers in the original graph = {graph_nodes}")
+    print(f"Only the following towers will be used = {bfs_nodes}")
+    print(f" -> The following towers will be neglected: {diff_nodes}")
+
+    universe, collection = create_instance_set_cover(intervals, bfs_nodes)
     print(f"Universe: {universe}")
-    print("Collection:")
+    print("Collection of subsets:")
     for i in range(0, len(collection)):
         print(f"Subset {i}:", collection[i])
 
     result = solve_set_cover(universe, collection)
-    print("Selected subsets:", result)
+    print("Selected subsets with index ", result)
     for i in result:
-        print(f"Subset {i}:", collection[i])
+        print(f" Subset {i}:", collection[i])
+
+    # retrieve the interval from the output subsets
 
     output = {
         "result": -1

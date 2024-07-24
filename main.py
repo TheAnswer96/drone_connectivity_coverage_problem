@@ -47,7 +47,7 @@ AREA_SIDE = 1000
 #      can't be fully covered
 SCENARIO = 1
 
-TOWERS = 5
+TOWERS = 8
 
 RADIUS_MIN = 300
 
