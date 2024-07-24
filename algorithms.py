@@ -2,13 +2,14 @@ from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 def single_minimum_eccentricity(instance):
     print("Algorithm Single Scenario: MEP\n")
     outputs = []
     # Result of the random instance
     G = instance["graph"]
-    nx.draw(G)
-    plt.show()
+    # nx.draw(G)
+    # plt.show()
     intervals = instance["intervals"]
     print("There are %d trajectories" % len(intervals))
     for interval in intervals:
@@ -23,7 +24,7 @@ def single_minimum_eccentricity(instance):
     # create_instance_set_cover(instance["intervals"])
     for i in range(len(intervals)):
         sol = {"eccentricity": -1, "used_intervals": []}
-        source = "S"+str(i)
+        source = "S" + str(i)
         length = round(intervals[i]["length"], 2)
         ecc = nx.eccentricity(G, source)
         depth = 1
@@ -148,6 +149,21 @@ def create_instance_set_cover(intervals):
 def multiple_minimum_eccentricity_opt(instance):
     G = instance["graph"]
     intervals = create_instance_set_cover(instance["intervals"])
+
+    universe = set()
+    collection = []
+    for interval in intervals:
+        for I in interval["interval"]:
+            mini = I["mini"]
+            tmp = set()
+            for m in mini:
+                universe.add(m)
+                tmp.add(m)
+
+            collection.append(tmp)
+
+    print(universe)
+    print(collection)
 
     output = {
         "result": -1

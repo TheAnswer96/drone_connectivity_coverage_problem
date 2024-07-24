@@ -103,23 +103,11 @@ if __name__ == '__main__':
     # Random instance
     instance = problem.generate_problem_instance(config)
 
-    # Result of the random instance
-    G = instance["graph"]
-    intervals = instance["intervals"]
-    # print("There are %d trajectories" % len(intervals))
-    # for interval in intervals:
-    #     length = interval["length"]
-    #     print(" Length=%.2f" % length)
-    #     for I in interval["interval"]:
-    #         tower = I["tower"]
-    #         inf = I["inf"]
-    #         sup = I["sup"]
-    #         print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
-
     # Algorithms
     # MEP
-    output1 = single_minimum_eccentricity(instance)
-    print(output1)
+    # output1 = single_minimum_eccentricity(instance)
+    # print(output1)
+
     # MTCP
     # output2 = single_minimum_coverage(instance)
 
@@ -127,6 +115,6 @@ if __name__ == '__main__':
     # output3 = single_minimum_k_coverage(instance)
 
     # MEPT
-    # output4 = multiple_minimum_eccentricity_opt(instance)
+    output4 = multiple_minimum_eccentricity_opt(instance)
     # output5 = multiple_minimum_eccentricity_v1(instance)
     # output6 = multiple_minimum_eccentricity_v2(instance)
