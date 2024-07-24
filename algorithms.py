@@ -1,4 +1,4 @@
-from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover
+from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover, solve_set_cover
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -162,8 +162,15 @@ def multiple_minimum_eccentricity_opt(instance):
 
             collection.append(tmp)
 
-    print(universe)
-    print(collection)
+    print(f"Universe: {universe}")
+    print("Collection:")
+    for i in range(0, len(collection)):
+        print(f"Subset {i}:", collection[i])
+
+    result = solve_set_cover(universe, collection)
+    print("Selected subsets:", result)
+    for i in result:
+        print(f"Subset {i}:", collection[i])
 
     output = {
         "result": -1
