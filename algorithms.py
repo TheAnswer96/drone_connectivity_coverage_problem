@@ -213,8 +213,7 @@ def multiple_minimum_eccentricity_opt(instance):
     G = instance["graph"]
     intervals = instance["intervals"]
 
-    # Determine the min d to cover all trajectories TODO
-    # new_intervals is a subset of intervals
+    # Determine the min d to cover all trajectories
     min_d_vec = []
     bfs_nodes_vec = []
     for i in range(len(intervals)):
@@ -236,6 +235,7 @@ def multiple_minimum_eccentricity_opt(instance):
             depth = depth + 1
 
     # print(min_d_vec)
+    # eccentricity to return
     max_min_d = max(min_d_vec)
     print(f"The minimum d to cover all trajectories is {max_min_d}")
     bfs_nodes = set()
@@ -265,7 +265,11 @@ def multiple_minimum_eccentricity_opt(instance):
     for i in result:
         print(f" Subset {i}:", collection[i])
 
-    # retrieve the interval from the output subsets
+    # retrieve the intervals/towers from the output subsets
+    # I_4 [0.00, 446.18]
+    # I_5 [372.18, 590.47]
+    # I_1 [0.00, 458.97]
+    # I_2 [6.88, 511.60]
 
     output = {
         "result": -1
