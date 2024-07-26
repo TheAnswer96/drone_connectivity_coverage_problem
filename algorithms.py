@@ -49,13 +49,52 @@ def single_minimum_eccentricity(instance):
 
 
 def single_minimum_coverage(instance):
-    # TODO
+    print("Algorithm Single Scenario: MEP\n")
+    outputs = []
+    # Result of the random instance
+    G = instance["graph"]
+    # nx.draw(G)
+    # plt.show()
+    intervals = instance["intervals"]
+    print("There are %d trajectories" % len(intervals))
+    for interval in intervals:
+        length = interval["length"]
+        print(" Length=%.2f" % length)
+        for I in interval["interval"]:
+            tower = I["tower"]
+            inf = I["inf"]
+            sup = I["sup"]
+            print("  T%d [%.2f, %.2f]" % (tower, inf, sup))
+    print("")
+    # create_instance_set_cover(instance["intervals"])
+    for i in range(len(intervals)):
+        temp = []
+        sol = {"eccentricity": -1, "used_intervals": []}
+        source = "S" + str(i)
+        length = round(intervals[i]["length"], 2)
+        ecc = nx.eccentricity(G, source)
+        depth = 1
+        while depth <= ecc:
+            bfs_tree = nx.bfs_tree(G, source, depth_limit=depth)
+            bfs_nodes = bfs_tree.nodes()
+            print("distance: ", depth)
+            print("nodes in connectivity graph: ", bfs_nodes)
+            cover, coverage = is_coverage(intervals[i], set(bfs_nodes))
+            print("*Exists feasible coverage: ", cover, "\n")
+            if cover:
+                sol = {
+                    "eccentricity": depth,
+                    "used_intervals": get_minimum_cover(coverage, length),
+                }
+                temp.append(sol)
+            depth = depth + 1
 
-    output = {
-        "result": -1
-    }
+        if not temp == []:
+            sol = min(temp, key=lambda x: (len(x["used_intervals"]), x["eccentricity"]))
+        output = {"trajectory": i, "solution": sol}
+        outputs.append(output)
 
-    return output
+    return outputs
 
 
 def single_minimum_k_coverage(instance):
