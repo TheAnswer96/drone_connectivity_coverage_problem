@@ -1,4 +1,4 @@
-from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover, solve_set_cover
+from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover, solve_set_cover, solve_set_cover_APX
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -236,7 +236,9 @@ def multiple_minimum_eccentricity_opt(instance):
 
     # print(min_d_vec)
     # eccentricity to return
-    max_min_d = max(min_d_vec)
+    max_min_d = -1
+    if len(min_d_vec) == len(intervals):
+        max_min_d = max(min_d_vec)
     print(f"The minimum d to cover all trajectories is {max_min_d}")
     bfs_nodes = set()
     for nodes in bfs_nodes_vec:
@@ -272,17 +274,77 @@ def multiple_minimum_eccentricity_opt(instance):
     # I_2 [6.88, 511.60]
 
     output = {
-        "result": -1
+        "eccentricity": max_min_d,
+        "used_intervals": result,
     }
 
     return output
 
 
 def multiple_minimum_eccentricity_v1(instance):
-    # TODO
+    G = instance["graph"]
+    intervals = instance["intervals"]
+
+    # Determine the min d to cover all trajectories
+    min_d_vec = []
+    bfs_nodes_vec = []
+    for i in range(len(intervals)):
+        source = "S" + str(i)
+        # length = round(intervals[i]["length"], 2)
+        ecc = nx.eccentricity(G, source)
+        depth = 1
+        while depth <= ecc:
+            bfs_tree = nx.bfs_tree(G, source, depth_limit=depth)
+            bfs_nodes = bfs_tree.nodes()
+            # print("distance: ", depth)
+            # print("nodes in connectivity graph: ", bfs_nodes)
+            cover, coverage = is_coverage(intervals[i], set(bfs_nodes))
+            # print("*Exists feasible coverage: ", cover, "\n")
+            if cover:
+                min_d_vec.append(depth)
+                bfs_nodes_vec.append(bfs_nodes)
+                break
+            depth = depth + 1
+
+    max_min_d = -1
+    if len(min_d_vec) == len(intervals):
+        max_min_d = max(min_d_vec)
+    print(f"The minimum d to cover all trajectories is {max_min_d}")
+    bfs_nodes = set()
+    for nodes in bfs_nodes_vec:
+        for node in nodes:
+            if isinstance(node, int):
+                bfs_nodes.add(node)
+
+    graph_nodes = set()
+    for node in G.nodes():
+        if isinstance(node, int):
+            graph_nodes.add(node)
+
+    diff_nodes = graph_nodes - bfs_nodes
+    print(f"Towers in the original graph = {graph_nodes}")
+    print(f"Only the following towers will be used = {bfs_nodes}")
+    print(f" -> The following towers will be neglected: {diff_nodes}")
+
+    universe, collection = create_instance_set_cover(intervals, bfs_nodes)
+    print(f"Universe: {universe}")
+    print("Collection of subsets:")
+    for i in range(0, len(collection)):
+        print(f"Subset {i}:", collection[i])
+
+    result = solve_set_cover_APX(universe, collection)
+    print("Selected subsets with index ", result)
+
+    # retrieve the intervals/towers from the output subsets
+    # I_4 [0.00, 446.18]
+    # I_5 [372.18, 590.47]
+    # I_1 [0.00, 458.97]
+    # I_2 [6.88, 511.60]
+
 
     output = {
-        "result": -1
+        "eccentricity": max_min_d,
+        "used_intervals": result,
     }
 
     return output

@@ -117,5 +117,5 @@ if __name__ == '__main__':
 
     # MEPT
     output4 = multiple_minimum_eccentricity_opt(instance)
-    # output5 = multiple_minimum_eccentricity_v1(instance)
+    output5 = multiple_minimum_eccentricity_v1(instance)
     # output6 = multiple_minimum_eccentricity_v2(instance)
