@@ -37,15 +37,23 @@ AREA_SIDE = 1000
 #      is connected
 #      fully covered
 
-#  5 - Path
-#      ????
+#  5 - Bus (?????)
+#      ignores both RADIUS_MIN and RADIUS_MAX
+#      is connected
+#      can't be fully covered
 
 #  6 - Ring Lattice
 #      ignores both RADIUS_MIN and RADIUS_MAX
 #      TOWERS must be >= 3 (if not, it is adjusted to 3)
 #      is connected
 #      can't be fully covered
-SCENARIO = 1
+
+#  7 - Star
+#      ignores both RADIUS_MIN and RADIUS_MAX and TOWERS
+#      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
+#      is connected
+#      can't be fully covered
+SCENARIO = 7
 
 TOWERS = 8
 
@@ -57,7 +65,10 @@ RADIUS_MAX = 700
 # it must be >= 2, even, and <= TOWERS/2
 LATTICE_NEIGHBORS = 2
 
-TRAJECTORIES = 2
+# it must be >= 3
+STAR_EDGES = 5
+
+TRAJECTORIES = 1
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
@@ -86,6 +97,9 @@ if __name__ == '__main__':
         # if LATTICE_NEIGHBORS > TOWERS / 2:
         #     LATTICE_NEIGHBORS = TOWERS / 2
 
+    if SCENARIO == 7:
+        TOWERS = STAR_EDGES**2 + STAR_EDGES + 1
+
     # Input parameters
     config = {
         "area_side": AREA_SIDE,
@@ -96,6 +110,7 @@ if __name__ == '__main__':
         "min_dist_trajectory": MIN_DIST_TRAJECTORY,
         "scenario": SCENARIO,
         "lattice_neighbors": LATTICE_NEIGHBORS,
+        "star_edges": STAR_EDGES,
         "seed": SEED,
         "debug": DEBUG
     }
