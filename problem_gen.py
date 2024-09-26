@@ -53,8 +53,7 @@ def generate_problem_instance(config):
     elif scenario == 4:
         tower_points, tower_radii, G = create_regular_diagonal(towers, area_side)
     elif scenario == 5:
-        print("Not implemented yet!")
-        exit(1)
+        tower_points, tower_radii, G = create_bus(towers, area_side)
     elif scenario == 6:
         tower_points, tower_radii, G = create_ring_lattice(towers, lattice_neighbors, area_side)
     elif scenario == 7:
@@ -70,45 +69,45 @@ def generate_problem_instance(config):
 
     dummy = set()
 
-    # # ----------------------------------
-    # # Plot
-    # plt.figure(figsize=(10, 10))
-    # plt.gca().set_aspect('equal', adjustable='box')
-    # plt.grid(True)
-    #
-    # plt.xlim([0, area_side])
-    # plt.ylim([0, area_side])
-    # plt.tight_layout()
-    #
-    # # Area
-    # plt.plot(area_x_coords, area_y_coords)
-    # plt.fill(area_x_coords, area_y_coords, alpha=0.025)
-    #
-    # # Towers + connectivity + coverage
-    # pos = nx.get_node_attributes(G, 'pos')
-    # x = [pos[node][0] for node in G.nodes() if node not in dummy]
-    # y = [pos[node][1] for node in G.nodes() if node not in dummy]
-    # plt.scatter(x, y, color='orange')
-    # for edge in G.edges():
-    #     if edge[0] not in dummy and edge[1] not in dummy:
-    #         x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
-    #         y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
-    #         plt.plot(x_coords, y_coords, color='black')
-    #
-    # for node, (x_coord, y_coord) in pos.items():
-    #     plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
-    #
-    # for i in range(0, towers):
-    #     tower_x = tower_points[i][0]
-    #     tower_y = tower_points[i][1]
-    #     radius = tower_radii[i]
-    #
-    #     circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
-    #     plt.gca().add_patch(circle)
-    #
-    # plt.show()
-    # exit(-44)
-    # # ----------------------------------
+    # ----------------------------------
+    # Plot
+    plt.figure(figsize=(10, 10))
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.grid(True)
+
+    plt.xlim([0, area_side])
+    plt.ylim([0, area_side])
+    plt.tight_layout()
+
+    # Area
+    plt.plot(area_x_coords, area_y_coords)
+    plt.fill(area_x_coords, area_y_coords, alpha=0.025)
+
+    # Towers + connectivity + coverage
+    pos = nx.get_node_attributes(G, 'pos')
+    x = [pos[node][0] for node in G.nodes() if node not in dummy]
+    y = [pos[node][1] for node in G.nodes() if node not in dummy]
+    plt.scatter(x, y, color='orange')
+    for edge in G.edges():
+        if edge[0] not in dummy and edge[1] not in dummy:
+            x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
+            y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
+            plt.plot(x_coords, y_coords, color='black')
+
+    for node, (x_coord, y_coord) in pos.items():
+        plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
+
+    for i in range(0, towers):
+        tower_x = tower_points[i][0]
+        tower_y = tower_points[i][1]
+        radius = tower_radii[i]
+
+        circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
+        plt.gca().add_patch(circle)
+
+    plt.show()
+    exit(-44)
+    # ----------------------------------
 
     # Trajectories
     trajectories_paths = []
@@ -613,5 +612,44 @@ def create_star(towers, star_edges, area_side):
     for i in range(1, star_edges + 1):
         for j in range(star_edges*i + 1, star_edges*(i+1) + 1):
             G.add_edge(i, j)
+
+    return tower_points, tower_radii, G
+
+
+def create_bus(towers, area_side):
+    r = area_side / 2
+    rp = r*2./3
+    center_x = area_side / 2
+    center_y = area_side / 2
+
+    angle_step = 2 * math.pi / (towers-1)
+
+    tower_points = []
+    intermediate_points = []
+
+    # Central tower
+    tower_points.append((center_x, center_y))
+
+    # Intermediate towers
+    for i in range(towers-1):
+        angle = i * angle_step
+        x = center_x + rp * math.cos(angle)
+        y = center_y + rp * math.sin(angle)
+        tower_points.append((x, y))
+        intermediate_points.append((x, y))
+
+    radius = 2 * rp * math.sin(angle_step/2.)
+
+    tower_radii = []
+    for i in range(0, towers):
+        tower_radii.append(radius)
+
+    G = nx.Graph()
+    for i in range(0, towers):
+        G.add_node(i, pos=tower_points[i])
+
+    # Central - Intermediate
+    for i in range(1, towers):
+        G.add_edge(0, i)
 
     return tower_points, tower_radii, G

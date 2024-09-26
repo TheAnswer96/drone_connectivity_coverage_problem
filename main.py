@@ -37,7 +37,7 @@ AREA_SIDE = 1000
 #      is connected
 #      fully covered
 
-#  5 - Bus (?????)
+#  5 - Bus
 #      ignores both RADIUS_MIN and RADIUS_MAX
 #      is connected
 #      can't be fully covered
@@ -53,9 +53,9 @@ AREA_SIDE = 1000
 #      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
 #      is connected
 #      can't be fully covered
-SCENARIO = 7
+SCENARIO = 5
 
-TOWERS = 8
+TOWERS = 13
 
 RADIUS_MIN = 300
 
