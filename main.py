@@ -73,6 +73,8 @@ TRAJECTORIES = 1
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
 
+ALGORITHM = 0
+
 SEED = 0
 
 DEBUG = True
@@ -119,18 +121,26 @@ if __name__ == '__main__':
     instance = problem.generate_problem_instance(config)
 
     # Algorithms
-    # MEP
-    # output1 = single_minimum_eccentricity(instance)
-    # print(output1)
+    output = []
+    if ALGORITHM == 0:
+        # MEP
+        output = single_minimum_eccentricity(instance)
+    elif ALGORITHM == 1:
+        # MTCP
+        output = single_minimum_coverage(instance)
+    elif ALGORITHM == 2:
+        # MEP-k
+        output = single_minimum_k_coverage(instance)
+    elif ALGORITHM == 3:
+        # MEPT
+        output = multiple_minimum_eccentricity_opt(instance)
+    elif ALGORITHM == 4:
+        # MEPT
+        output = multiple_minimum_eccentricity_v1(instance)
+    elif ALGORITHM == 5:
+        # MEPT
+        output = multiple_minimum_eccentricity_v2(instance)
 
-    # MTCP
-    # output2 = single_minimum_coverage(instance)
-    # print(output2)
 
-    # MEP-k ??
-    # output3 = single_minimum_k_coverage(instance)
 
-    # MEPT
-    output4 = multiple_minimum_eccentricity_opt(instance)
-    output5 = multiple_minimum_eccentricity_v1(instance)
-    # output6 = multiple_minimum_eccentricity_v2(instance)
+

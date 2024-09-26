@@ -69,45 +69,45 @@ def generate_problem_instance(config):
 
     dummy = set()
 
-    # ----------------------------------
-    # Plot
-    plt.figure(figsize=(10, 10))
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.grid(True)
-
-    plt.xlim([0, area_side])
-    plt.ylim([0, area_side])
-    plt.tight_layout()
-
-    # Area
-    plt.plot(area_x_coords, area_y_coords)
-    plt.fill(area_x_coords, area_y_coords, alpha=0.025)
-
-    # Towers + connectivity + coverage
-    pos = nx.get_node_attributes(G, 'pos')
-    x = [pos[node][0] for node in G.nodes() if node not in dummy]
-    y = [pos[node][1] for node in G.nodes() if node not in dummy]
-    plt.scatter(x, y, color='orange')
-    for edge in G.edges():
-        if edge[0] not in dummy and edge[1] not in dummy:
-            x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
-            y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
-            plt.plot(x_coords, y_coords, color='black')
-
-    for node, (x_coord, y_coord) in pos.items():
-        plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
-
-    for i in range(0, towers):
-        tower_x = tower_points[i][0]
-        tower_y = tower_points[i][1]
-        radius = tower_radii[i]
-
-        circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
-        plt.gca().add_patch(circle)
-
-    plt.show()
-    exit(-44)
-    # ----------------------------------
+    # # ----------------------------------
+    # # Plot
+    # plt.figure(figsize=(10, 10))
+    # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.grid(True)
+    #
+    # plt.xlim([0, area_side])
+    # plt.ylim([0, area_side])
+    # plt.tight_layout()
+    #
+    # # Area
+    # plt.plot(area_x_coords, area_y_coords)
+    # plt.fill(area_x_coords, area_y_coords, alpha=0.025)
+    #
+    # # Towers + connectivity + coverage
+    # pos = nx.get_node_attributes(G, 'pos')
+    # x = [pos[node][0] for node in G.nodes() if node not in dummy]
+    # y = [pos[node][1] for node in G.nodes() if node not in dummy]
+    # plt.scatter(x, y, color='orange')
+    # for edge in G.edges():
+    #     if edge[0] not in dummy and edge[1] not in dummy:
+    #         x_coords = [pos[edge[0]][0], pos[edge[1]][0]]
+    #         y_coords = [pos[edge[0]][1], pos[edge[1]][1]]
+    #         plt.plot(x_coords, y_coords, color='black')
+    #
+    # for node, (x_coord, y_coord) in pos.items():
+    #     plt.text(x_coord + 10, y_coord + 10, 'T' + str(node), fontsize=12, ha='right')
+    #
+    # for i in range(0, towers):
+    #     tower_x = tower_points[i][0]
+    #     tower_y = tower_points[i][1]
+    #     radius = tower_radii[i]
+    #
+    #     circle = plt.Circle((tower_x, tower_y), radius, color='orange', alpha=0.1)
+    #     plt.gca().add_patch(circle)
+    #
+    # plt.show()
+    # exit(-44)
+    # # ----------------------------------
 
     # Trajectories
     trajectories_paths = []
