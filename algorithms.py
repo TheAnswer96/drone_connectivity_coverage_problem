@@ -285,6 +285,8 @@ def multiple_minimum_eccentricity_v1(instance):
     G = instance["graph"]
     intervals = instance["intervals"]
 
+    print(intervals)
+    exit()
     # Determine the min d to cover all trajectories
     min_d_vec = []
     bfs_nodes_vec = []
@@ -351,10 +353,33 @@ def multiple_minimum_eccentricity_v1(instance):
 
 
 def multiple_minimum_eccentricity_v2(instance):
-    # TODO
+    result = []
+    max_min_d = 0
+    unique_towers = set()
+
+    # Call single_minimum_eccentricity function
+    outputs = single_minimum_eccentricity(instance)
+
+    for output in outputs:
+        index = output["trajectory"]
+        sol = output["solution"]
+        max_min_d = max(max_min_d, sol["eccentricity"])
+        for interval in sol["used_intervals"]:
+            unique_towers.add(interval[2])
+        #single min eccentricity solution, namely MEP
+        result.append({
+            "trajectory": index,
+            "solution": sol
+        })
+
+    # Total number of unique towers used across all trajectories
+    total_unique_towers = len(unique_towers)
 
     output = {
-        "result": -1
+        "eccentricity": max_min_d,
+        "used_intervals": result,
+        "total_unique_towers": total_unique_towers
     }
 
     return output
+

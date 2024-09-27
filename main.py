@@ -68,12 +68,12 @@ LATTICE_NEIGHBORS = 2
 # it must be >= 3
 STAR_EDGES = 5
 
-TRAJECTORIES = 1
+TRAJECTORIES = 2
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
 
-ALGORITHM = 0
+ALGORITHM = 5
 
 SEED = 0
 
@@ -140,7 +140,9 @@ if __name__ == '__main__':
     elif ALGORITHM == 5:
         # MEPT
         output = multiple_minimum_eccentricity_v2(instance)
-
+        print(output)
+        output = multiple_minimum_eccentricity_opt(instance)
+        print(output)
 
 
 
