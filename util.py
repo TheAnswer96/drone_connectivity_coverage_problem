@@ -70,7 +70,7 @@ def is_coverage(intervals, nodes):
         if int(interval["tower"]) in nodes:
             towers.append([round(interval["inf"], 2), round(interval["sup"], 2), "T" + str(interval["tower"])])
     towers.sort(key=lambda x: x[0])
-    print(towers)
+    # print(towers)
     last_covered = 0
     for start, end, _ in towers:
         if start > last_covered:

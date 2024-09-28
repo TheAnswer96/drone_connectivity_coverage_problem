@@ -141,6 +141,7 @@ if __name__ == '__main__':
         # MEPT
         output = multiple_minimum_eccentricity_v2(instance)
         print(output)
+        print("########################")
         output = multiple_minimum_eccentricity_opt(instance)
         print(output)
 
