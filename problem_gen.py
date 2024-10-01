@@ -530,7 +530,7 @@ def create_regular_diagonal(towers, area_side):
 
 
 def create_ring_lattice(towers, lattice_neighbors, area_side):
-    r = area_side / 2
+    r = (2/3.) * area_side / 2
     center_x = area_side / 2
     center_y = area_side / 2
 
