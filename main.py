@@ -53,17 +53,17 @@ AREA_SIDE = 1000
 #      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
 #      is connected
 #      can't be fully covered
-SCENARIO = 5
+SCENARIO = 1
 
-TOWERS = 13
+TOWERS = 50
 
-RADIUS_MIN = 300
+RADIUS_MIN = 170
 
 # it must be >= RADIUS_MIN
-RADIUS_MAX = 700
+RADIUS_MAX = 300
 
 # it must be >= 2, even, and <= TOWERS/2
-LATTICE_NEIGHBORS = 2
+LATTICE_NEIGHBORS = 4
 
 # it must be >= 3
 STAR_EDGES = 5
@@ -76,6 +76,8 @@ MIN_DIST_TRAJECTORY = 500
 ALGORITHM = 5
 
 SEED = 0
+
+ITERATIONS = 25
 
 DEBUG = True
 ########################################################################################################################
@@ -102,48 +104,52 @@ if __name__ == '__main__':
     if SCENARIO == 7:
         TOWERS = STAR_EDGES**2 + STAR_EDGES + 1
 
-    # Input parameters
-    config = {
-        "area_side": AREA_SIDE,
-        "towers": TOWERS,
-        "radius_min": RADIUS_MIN,
-        "radius_max": RADIUS_MAX,
-        "trajectories": TRAJECTORIES,
-        "min_dist_trajectory": MIN_DIST_TRAJECTORY,
-        "scenario": SCENARIO,
-        "lattice_neighbors": LATTICE_NEIGHBORS,
-        "star_edges": STAR_EDGES,
-        "seed": SEED,
-        "debug": DEBUG
-    }
+    for i in range(1, ITERATIONS+1):
+        print(f"Iteration {i}/{ITERATIONS}")
+        # Input parameters
+        config = {
+            "area_side": AREA_SIDE,
+            "towers": TOWERS,
+            "radius_min": RADIUS_MIN,
+            "radius_max": RADIUS_MAX,
+            "trajectories": TRAJECTORIES,
+            "min_dist_trajectory": MIN_DIST_TRAJECTORY,
+            "scenario": SCENARIO,
+            "lattice_neighbors": LATTICE_NEIGHBORS,
+            "star_edges": STAR_EDGES,
+            "seed": i,
+            "debug": DEBUG
+        }
 
-    # Random instance
-    instance = problem.generate_problem_instance(config)
+        # Random instance
+        instance = problem.generate_problem_instance(config)
 
-    # Algorithms
-    output = []
-    if ALGORITHM == 0:
-        # MEP
-        output = single_minimum_eccentricity(instance)
-    elif ALGORITHM == 1:
-        # MTCP
-        output = single_minimum_coverage(instance)
-    elif ALGORITHM == 2:
-        # MEP-k
-        output = single_minimum_k_coverage(instance)
-    elif ALGORITHM == 3:
-        # MEPT
-        output = multiple_minimum_eccentricity_opt(instance)
-    elif ALGORITHM == 4:
-        # MEPT
-        output = multiple_minimum_eccentricity_v1(instance)
-    elif ALGORITHM == 5:
-        # MEPT
-        output = multiple_minimum_eccentricity_v2(instance)
-        print(output)
-        print("########################")
-        output = multiple_minimum_eccentricity_opt(instance)
-        print(output)
+        # Algorithms
+        output = []
+        if ALGORITHM == 0:
+            # MEP
+            output = single_minimum_eccentricity(instance)
+        elif ALGORITHM == 1:
+            # MTCP
+            output = single_minimum_coverage(instance)
+        elif ALGORITHM == 2:
+            # MEP-k
+            output = single_minimum_k_coverage(instance)
+        elif ALGORITHM == 3:
+            # MEPT
+            output = multiple_minimum_eccentricity_opt(instance)
+        elif ALGORITHM == 4:
+            # MEPT
+            output = multiple_minimum_eccentricity_v1(instance)
+        elif ALGORITHM == 5:
+            # MEPT
+            output_v2 = multiple_minimum_eccentricity_v2(instance)
+            print(output_v2)
+            output_opt = multiple_minimum_eccentricity_opt(instance)
+            print(output_opt)
+            if output_opt["total_towers"] > output_v2["total_towers"]:
+                print(f"Error - seed={i}")
+            print("########################")
 
 
 

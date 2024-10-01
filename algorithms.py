@@ -146,7 +146,6 @@ def create_instance_set_cover(intervals, bfs_nodes):
         # print(f"The whole interval can be split into {len(segments)} mini intervals")
         for start, end, active_towers in segments:
             # print(f"  I_{i}^{j} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
-            # print(f"  I_{(i, j)} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
             mini_interval = {
                 "subscript": i,
                 "superscript": j,
@@ -182,8 +181,6 @@ def create_instance_set_cover(intervals, bfs_nodes):
             sup = I["sup"]
             mini = I["mini"]
             # print(f"  I_{tower} [{inf:.2f}, {sup:.2f}] -> {mini}")
-            # for subscript, superscript in mini:
-            #     print(f"      I_{subscript}^{superscript}")
 
         # Next iteration
         i = i + 1
@@ -205,8 +202,12 @@ def create_instance_set_cover(intervals, bfs_nodes):
                 universe.add(m)
                 tmp.add(m)
 
-            collection.append(tmp)
-            tower_ids.append(tower)
+            idx = tower_ids.index(tower) if tower in tower_ids else -1
+            if idx != -1:  # If tower exists in the list
+                collection[idx].update(tmp)  # Use update to merge sets
+            else:
+                collection.append(tmp)  # Append the set directly
+                tower_ids.append(tower)
 
     return universe, collection, tower_ids
 
@@ -271,7 +272,7 @@ def multiple_minimum_eccentricity_opt(instance):
     # print("Selected subsets with index ", result)
     # for i in result:
     #     print(f" Subset {i}:", collection[i])
-
+    #
     # print("Selected towers")
     # for i in result:
     #     print(f" T_{tower_ids[i]}")
@@ -280,11 +281,11 @@ def multiple_minimum_eccentricity_opt(instance):
     for i in result:
         towers_out.add(f"T{tower_ids[i]}")
 
-    # # print("Selected unique towers")
-    # res = []
-    # for t in towers_out:
-    #     # print(f" T_{t}")
-    #     res.append(t)
+    # print("Selected unique towers")
+    res = []
+    for t in towers_out:
+        # print(f" T_{t}")
+        res.append(t)
 
     output = {
         "eccentricity": max_min_d,
