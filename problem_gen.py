@@ -1,14 +1,12 @@
-import math
-
 import networkx as nx
 import random
 import matplotlib.pyplot as plt
 import numpy as np
-import sympy as sp
+# import sympy as sp
 import math
 from sympy import Polygon, Point
 
-from util import get_distance, EPSILON
+from util import get_distance, EPSILON, circle_segment_intersection, is_zero
 
 
 def generate_problem_instance(config):
@@ -27,12 +25,15 @@ def generate_problem_instance(config):
     random.seed(seed)
 
     # Area
-    points = [Point(0, 0), Point(area_side, 0), Point(area_side, area_side), Point(0, area_side), Point(0, 0)]
-    area_x_coords = []
-    area_y_coords = []
-    for i in range(0, len(points)):
-        area_x_coords.append(points[i].x)
-        area_y_coords.append(points[i].y)
+    points = [
+        (0, 0),
+        (area_side, 0),
+        (area_side, area_side),
+        (0, area_side),
+        (0, 0)
+    ]
+    area_x_coords = [point[0] for point in points]
+    area_y_coords = [point[1] for point in points]
 
     # Towers
     tower_points = []
@@ -124,27 +125,53 @@ def generate_problem_instance(config):
             continue
 
         # Calculate intersections
-        p0 = sp.Point(x_0, y_0)
-        p1 = sp.Point(x_1, y_1)
+        # p0 = sp.Point(x_0, y_0)
+        # p1 = sp.Point(x_1, y_1)
+        p0 = (x_0, y_0)
+        p1 = (x_1, y_1)
 
         intersections = []
         for j in range(0, towers):
             tower_x, tower_y = tower_points[j]
             radius = tower_radii[j]
-            segment = sp.Segment(p0, p1)
-            circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
-            ints = (segment.intersection(circle))
+            # segment = sp.Segment(p0, p1)
+            # circle = sp.Circle(sp.Point(tower_x, tower_y), radius)
+            circle_center = (tower_x, tower_y)
+            # ints = (segment.intersection(circle))
+            ints = circle_segment_intersection(x_0, y_0, x_1, y_1, tower_x, tower_y, radius)
+
+            # for idx in range(0, len(ints)):
+            #     v1_0 = ints[idx][0].evalf()
+            #     v1_1 = ints[idx][1].evalf()
+            #     v2_0 = ints2[idx][0]
+            #     v2_1 = ints2[idx][1]
+            #
+            #     diff_0 = v1_0 - v2_0
+            #     diff_1 = v1_1 - v2_1
+            #
+            #     if not (is_zero(diff_0) and is_zero(diff_1)):
+            #         print("Error")
+
             if ints:
                 if len(ints) == 2:
                     intersections.append((ints, j))
                 else:
-                    if p0.distance(circle.center) < circle.radius:
+                    # Check distances
+                    if get_distance(p0, circle_center) < radius:
                         ints.append(p0)
-                    elif p1.distance(circle.center) < circle.radius:
+                    elif get_distance(p1, circle_center) < radius:
                         ints.append(p1)
                     else:
                         # Tangent case, empty interval, so skip
-                        break
+                        pass  # No action needed for this case
+
+                    # if p0.distance(circle.center) < radius:
+                    #     ints.append(p0)
+                    # elif p1.distance(circle.center) < radius:
+                    #     ints.append(p1)
+                    # else:
+                    #     # Tangent case, empty interval, so skip
+                    #     break
 
                     intersections.append((ints, j))
 
@@ -156,10 +183,14 @@ def generate_problem_instance(config):
             ints = intersections[j]
             tower_id = ints[1]
 
-            i0x = ints[0][0].x
-            i0y = ints[0][0].y
-            i1x = ints[0][1].x
-            i1y = ints[0][1].y
+            # i0x = ints[0][0].x
+            # i0y = ints[0][0].y
+            # i1x = ints[0][1].x
+            # i1y = ints[0][1].y
+            i0x = ints[0][0][0]
+            i0y = ints[0][0][1]
+            i1x = ints[0][1][0]
+            i1y = ints[0][1][1]
             dist_i0 = get_distance((x_0, y_0), (i0x, i0y))
             dist_i1 = get_distance((x_0, y_0), (i1x, i1y))
 
@@ -279,10 +310,14 @@ def generate_problem_instance(config):
                 y_values = []
                 # print("  I -> T%d" % tower_id)
 
-                i0x = ints[0][0].x
-                i0y = ints[0][0].y
-                i1x = ints[0][1].x
-                i1y = ints[0][1].y
+                # i0x = ints[0][0].x
+                # i0y = ints[0][0].y
+                # i1x = ints[0][1].x
+                # i1y = ints[0][1].y
+                i0x = ints[0][0][0]
+                i0y = ints[0][0][1]
+                i1x = ints[0][1][0]
+                i1y = ints[0][1][1]
                 tx = tower_points[tower_id][0]
                 ty = tower_points[tower_id][1]
 

@@ -50,22 +50,22 @@ AREA_SIDE = 1000
 #      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
 #      is connected
 #      can't be fully covered
-SCENARIO = 1
+SCENARIO = 6
 
-TOWERS = 15
+TOWERS = 250
 
-RADIUS_MIN = 250
+RADIUS_MIN = 100
 
 # it must be >= RADIUS_MIN
 RADIUS_MAX = 300
 
 # it must be >= 2, even, and <= TOWERS/2
-LATTICE_NEIGHBORS = 2
+LATTICE_NEIGHBORS = 100
 
 # it must be >= 3
 STAR_EDGES = 5
 
-TRAJECTORIES = 2
+TRAJECTORIES = 20
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
@@ -84,7 +84,7 @@ SEED = 0
 
 ITERATIONS = 25
 
-DEBUG = True
+DEBUG = False
 ########################################################################################################################
 
 if __name__ == '__main__':

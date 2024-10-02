@@ -23,6 +23,40 @@ def get_distance(p0, p1):
     return math.sqrt((p1[0] - p0[0]) ** 2 + (p1[1] - p0[1]) ** 2)
 
 
+def circle_segment_intersection(x0, y0, x1, y1, cx, cy, r):
+    # Vector from (x0, y0) to (x1, y1)
+    dx = x1 - x0
+    dy = y1 - y0
+
+    # Quadratic coefficients
+    a = dx ** 2 + dy ** 2
+    b = 2 * (dx * (x0 - cx) + dy * (y0 - cy))
+    c = (x0 - cx) ** 2 + (y0 - cy) ** 2 - r ** 2
+
+    # Calculate the discriminant
+    discriminant = b ** 2 - 4 * a * c
+
+    if discriminant < 0:
+        # No intersection
+        return []
+
+    # Calculate the two points of intersection
+    sqrt_discriminant = math.sqrt(discriminant)
+    t1 = (-b - sqrt_discriminant) / (2 * a)
+    t2 = (-b + sqrt_discriminant) / (2 * a)
+
+    # Find the intersection points
+    intersection_points = []
+
+    for t in [t1, t2]:
+        if 0 <= t <= 1:  # Check if the intersection is within the segment
+            ix = x0 + t * dx
+            iy = y0 + t * dy
+            intersection_points.append((ix, iy))
+
+    return intersection_points
+
+
 def do_intervals_overlap(interval1, interval2):
     start1, end1 = interval1
     start2, end2 = interval2
