@@ -2,7 +2,8 @@ import math
 import time
 import problem_gen as problem
 from algorithms import *
-from util import is_square
+from util import is_square, experiments
+import argparse
 
 ######################################### HYPER-PARAMETERS #############################################################
 
@@ -88,6 +89,38 @@ DEBUG = False
 ########################################################################################################################
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Initialize experiments...")
+
+    parser.add_argument("--area_side", type=int, default=1000, help="The side of the area you want to use. Express it in meters. [Default=1000]")
+    parser.add_argument("--scenario", type=int, default=1, help="Scenario number ranges from -1 to 7. [Default=1]")
+    parser.add_argument("--towers", type=int, default=250, help="Number of towers. [Default=250].")
+    parser.add_argument("--radius_min", type=int, default=100, help="Minimum radius in meters. [Default=100]")
+    parser.add_argument("--radius_max", type=int, default=300,
+                        help="Maximum radius in meters, must be >= RADIUS_MIN. [Default=300]")
+    parser.add_argument("--lattice_neighbors", type=int, default=100,
+                        help="Must be >= 2, even, and <= TOWERS/2. [Default=100]")
+    parser.add_argument("--star_edges", type=int, default=5, help="Number of star edges, must be >= 3. [Default=5]")
+    parser.add_argument("--trajectories", type=int, default=100, help="Number of trajectories. [Default=100]")
+    parser.add_argument("--min_dist_trajectory", type=int, default=500,
+                        help="Minimum distance of trajectory in meters, must be less than AREA_SIDE * sqrt(2). [Default=500]")
+    parser.add_argument("--algorithm", type=int, default=6, help="Algorithm selection from 0 to 6. [Default=6]")
+    parser.add_argument("--seed", type=int, default=0, help="Random seed. [Default=0]")
+    parser.add_argument("--iterations", type=int, default=25, help="Number of iterations. [Default=25]")
+    parser.add_argument("--debug", action='store_true', help="Enable debug mode. [Default=False]")
+    args = parser.parse_args()
+    AREA_SIDE = args.area_side
+    SCENARIO = args.scenario
+    TOWERS = args.towers
+    RADIUS_MIN = args.radius_min
+    RADIUS_MAX = args.radius_max
+    LATTICE_NEIGHBORS = args.lattice_neighbors
+    STAR_EDGES = args.star_edges
+    TRAJECTORIES = args.trajectories
+    MIN_DIST_TRAJECTORY = args.min_dist_trajectory
+    ALGORITHM = args.algorithm
+    SEED = args.seed
+    ITERATIONS = args.iterations
+    DEBUG = args.debug
 
     if SCENARIO == 3 or SCENARIO == 4:
         if not is_square(TOWERS):
@@ -109,10 +142,7 @@ if __name__ == '__main__':
     if SCENARIO == 7:
         TOWERS = STAR_EDGES**2 + STAR_EDGES + 1
 
-    for i in range(1, ITERATIONS+1):
-        print(f"Iteration {i}/{ITERATIONS}")
-        # Input parameters
-        config = {
+    hyper = {
             "area_side": AREA_SIDE,
             "towers": TOWERS,
             "radius_min": RADIUS_MIN,
@@ -122,48 +152,64 @@ if __name__ == '__main__':
             "scenario": SCENARIO,
             "lattice_neighbors": LATTICE_NEIGHBORS,
             "star_edges": STAR_EDGES,
-            "seed": i,
             "debug": DEBUG
         }
-
-        # Random instance
-        start_time = time.time()
-        instance = problem.generate_problem_instance(config)
-        end_time = time.time()
-
-        elapsed_time = end_time - start_time
-        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
-
-        # Algorithms
-        if ALGORITHM == 0:
-            # Minimum Eccentricity Problem - MEP
-            output = alg_E_MEP(instance)
-            print(output)
-        # elif ALGORITHM == 1:
-        #     # MEP-k
-        #     output = single_minimum_k_coverage(instance)
-        #     print(output)
-        elif ALGORITHM == 2:
-            # Minimum Tower Coverage Problem - MTCP
-            output = alg_C_MTCP(instance)
-            print(output)
-        elif ALGORITHM == 3:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_OPT_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 4:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_E_SC_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 5:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_E_T_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 6:
-            output_v1 = alg_E_SC_MEPT(instance)
-            print(output_v1)
-            output_v2 = alg_E_T_MEPT(instance)
-            print(output_v2)
-            output_opt = alg_OPT_MEPT(instance)
-            print(output_opt)
-            print("########################")
+    experiments(ITERATIONS, hyper, algorithm)
+    # for i in range(1, ITERATIONS+1):
+    #     print(f"Iteration {i}/{ITERATIONS}")
+    #     # Input parameters
+    #     config = {
+    #         "area_side": AREA_SIDE,
+    #         "towers": TOWERS,
+    #         "radius_min": RADIUS_MIN,
+    #         "radius_max": RADIUS_MAX,
+    #         "trajectories": TRAJECTORIES,
+    #         "min_dist_trajectory": MIN_DIST_TRAJECTORY,
+    #         "scenario": SCENARIO,
+    #         "lattice_neighbors": LATTICE_NEIGHBORS,
+    #         "star_edges": STAR_EDGES,
+    #         "seed": i,
+    #         "debug": DEBUG
+    #     }
+    #
+    #     # Random instance
+    #     start_time = time.time()
+    #     instance = problem.generate_problem_instance(config)
+    #     end_time = time.time()
+    #
+    #     elapsed_time = end_time - start_time
+    #     print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+    #
+    #     # Algorithms
+    #     if ALGORITHM == 0:
+    #         # Minimum Eccentricity Problem - MEP
+    #         output = alg_E_MEP(instance)
+    #         print(output)
+    #     # elif ALGORITHM == 1:
+    #     #     # MEP-k
+    #     #     output = single_minimum_k_coverage(instance)
+    #     #     print(output)
+    #     elif ALGORITHM == 2:
+    #         # Minimum Tower Coverage Problem - MTCP
+    #         output = alg_C_MTCP(instance)
+    #         print(output)
+    #     elif ALGORITHM == 3:
+    #         # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+    #         output = alg_OPT_MEPT(instance)
+    #         print(output)
+    #     elif ALGORITHM == 4:
+    #         # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+    #         output = alg_E_SC_MEPT(instance)
+    #         print(output)
+    #     elif ALGORITHM == 5:
+    #         # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+    #         output = alg_E_T_MEPT(instance)
+    #         print(output)
+    #     elif ALGORITHM == 6:
+    #         output_v1 = alg_E_SC_MEPT(instance)
+    #         print(output_v1)
+    #         output_v2 = alg_E_T_MEPT(instance)
+    #         print(output_v2)
+    #         output_opt = alg_OPT_MEPT(instance)
+    #         print(output_opt)
+    #         print("########################")
