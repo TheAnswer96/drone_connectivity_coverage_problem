@@ -126,8 +126,8 @@ def solve_set_cover_APX(universe, collection):
     selected_collections_index = []
     selected_collections = []
 
-    print("Initial Universe:", universe)
-    print("Initial Collection:", collection)
+    # print("Initial Universe:", universe)
+    # print("Initial Collection:", collection)
 
     while uncovered:
         best = None
@@ -136,20 +136,20 @@ def solve_set_cover_APX(universe, collection):
         for index, col in enumerate(collection):
             intersection = uncovered & col
             intersection_size = len(intersection)
-            print(f"Subset {index}: {col}, Covers {intersection_size} uncovered elements")
+            # print(f"Subset {index}: {col}, Covers {intersection_size} uncovered elements")
             if intersection_size > max_cover:
                 max_cover = intersection_size
                 best = col
                 best_index = index
         if max_cover == 0:
-            print("No subset can cover any more uncovered elements.")
+            # print("No subset can cover any more uncovered elements.")
             break
         selected_collections_index.append(best_index)
         selected_collections.append(best)
         uncovered = uncovered - best
-        print(f"\nSelected Subset {best_index}: {best}")
-        print(f"Uncovered Elements Remaining: {uncovered}\n")
+        # print(f"\nSelected Subset {best_index}: {best}")
+        # print(f"Uncovered Elements Remaining: {uncovered}\n")
 
-    print("Selected Subsets Indices:", selected_collections_index)
-    print("Selected Subsets Collections:", selected_collections)
+    # print("Selected Subsets Indices:", selected_collections_index)
+    # print("Selected Subsets Collections:", selected_collections)
     return selected_collections

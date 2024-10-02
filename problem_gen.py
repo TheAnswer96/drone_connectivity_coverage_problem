@@ -41,9 +41,6 @@ def generate_problem_instance(config):
 
     if scenario == -1:
         tower_points, tower_radii, G = create_test(config)
-    elif scenario == 0:
-        print("Not implemented yet!")
-        exit(1)
     elif scenario == 1:
         tower_points, tower_radii, G = create_RGG_fixed_radius(radius_min, towers, area_side)
     elif scenario == 2:

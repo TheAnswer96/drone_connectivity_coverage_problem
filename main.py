@@ -12,9 +12,6 @@ AREA_SIDE = 1000
 # There are many scenarios:
 # -1 - Test (fixed)
 
-#  0 - Complete graph
-#      ???? (set cover problem, trivial)
-
 #  1 - RGG with fixed r
 #      considers only RADIUS_MIN
 #      can be disconnected
@@ -53,11 +50,11 @@ AREA_SIDE = 1000
 #      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
 #      is connected
 #      can't be fully covered
-SCENARIO = 6
+SCENARIO = 1
 
 TOWERS = 15
 
-RADIUS_MIN = 170
+RADIUS_MIN = 250
 
 # it must be >= RADIUS_MIN
 RADIUS_MAX = 300
@@ -68,12 +65,20 @@ LATTICE_NEIGHBORS = 2
 # it must be >= 3
 STAR_EDGES = 5
 
-TRAJECTORIES = 5
+TRAJECTORIES = 2
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
 
-ALGORITHM = 5
+# 0 - MEP   alg_E_MEP
+# 1 - MEP-k [not used-implemented]
+# 2 - MTCP  alg_C_MTCP
+# 3 - MEPT  alg_OPT_MEPT
+# 4 - MEPT  alg_E_SC_MEPT
+# 5 - MEPT  alg_E_T_MEPT
+# ---------
+# 6 - MEPT v1, v2 vs OPT
+ALGORITHM = 6
 
 SEED = 0
 
@@ -125,31 +130,35 @@ if __name__ == '__main__':
         instance = problem.generate_problem_instance(config)
 
         # Algorithms
-        output = []
         if ALGORITHM == 0:
-            # MEP
-            output = single_minimum_eccentricity(instance)
-        elif ALGORITHM == 1:
-            # MTCP
-            output = single_minimum_coverage(instance)
+            # Minimum Eccentricity Problem - MEP
+            output = alg_E_MEP(instance)
+            print(output)
+        # elif ALGORITHM == 1:
+        #     # MEP-k
+        #     output = single_minimum_k_coverage(instance)
+        #     print(output)
         elif ALGORITHM == 2:
-            # MEP-k
-            output = single_minimum_k_coverage(instance)
+            # Minimum Tower Coverage Problem - MTCP
+            output = alg_C_MTCP(instance)
+            print(output)
         elif ALGORITHM == 3:
-            # MEPT
-            output = multiple_minimum_eccentricity_opt(instance)
+            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+            output = alg_OPT_MEPT(instance)
+            print(output)
         elif ALGORITHM == 4:
-            # MEPT
-            output = multiple_minimum_eccentricity_v1(instance)
+            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+            output = alg_E_SC_MEPT(instance)
+            print(output)
         elif ALGORITHM == 5:
-            # MEPT
-            output_v2 = multiple_minimum_eccentricity_v2(instance)
+            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
+            output = alg_E_T_MEPT(instance)
+            print(output)
+        elif ALGORITHM == 6:
+            output_v1 = alg_E_SC_MEPT(instance)
+            print(output_v1)
+            output_v2 = alg_E_T_MEPT(instance)
             print(output_v2)
-            output_opt = multiple_minimum_eccentricity_opt(instance)
+            output_opt = alg_OPT_MEPT(instance)
             print(output_opt)
-            if output_opt["total_towers"] > output_v2["total_towers"]:
-                print(f"Error - seed={i}")
             print("########################")
-
-
-

@@ -1,9 +1,9 @@
-from util import is_zero, create_interval_graph, is_coverage, get_minimum_cover, solve_set_cover, solve_set_cover_APX
 import networkx as nx
-import matplotlib.pyplot as plt
+
+from util import is_zero, is_coverage, get_minimum_cover, solve_set_cover, solve_set_cover_APX
 
 
-def single_minimum_eccentricity(instance):
+def alg_E_MEP(instance):
     # print("Algorithm Single Scenario: MEP\n")
     outputs = []
     # Result of the random instance
@@ -23,7 +23,10 @@ def single_minimum_eccentricity(instance):
     # print("")
     # create_instance_set_cover(instance["intervals"])
     for i in range(len(intervals)):
-        sol = {"eccentricity": -1, "used_intervals": []}
+        sol = {
+            "eccentricity": -1,
+            "used_intervals": []
+        }
         source = "S" + str(i)
         length = round(intervals[i]["length"], 2)
         ecc = nx.eccentricity(G, source)
@@ -48,7 +51,7 @@ def single_minimum_eccentricity(instance):
     return outputs
 
 
-def single_minimum_coverage(instance):
+def alg_C_MTCP(instance):
     print("Algorithm Single Scenario: MEP\n")
     outputs = []
     # Result of the random instance
@@ -212,7 +215,7 @@ def create_instance_set_cover(intervals, bfs_nodes):
     return universe, collection, tower_ids
 
 
-def multiple_minimum_eccentricity_opt(instance):
+def alg_OPT_MEPT(instance):
     G = instance["graph"]
     intervals = instance["intervals"]
 
@@ -288,6 +291,7 @@ def multiple_minimum_eccentricity_opt(instance):
         res.append(t)
 
     output = {
+        "algorithm": "alg_OPT_MEPT",
         "eccentricity": max_min_d,
         "towers": towers_out,
         "total_towers": len(towers_out)
@@ -296,12 +300,12 @@ def multiple_minimum_eccentricity_opt(instance):
     return output
 
 
-def multiple_minimum_eccentricity_v1(instance):
+def alg_E_SC_MEPT(instance):
     G = instance["graph"]
     intervals = instance["intervals"]
 
-    print(intervals)
-    exit()
+    # print(intervals)
+    # exit()
     # Determine the min d to cover all trajectories
     min_d_vec = []
     bfs_nodes_vec = []
@@ -326,7 +330,8 @@ def multiple_minimum_eccentricity_v1(instance):
     max_min_d = -1
     if len(min_d_vec) == len(intervals):
         max_min_d = max(min_d_vec)
-    print(f"The minimum d to cover all trajectories is {max_min_d}")
+
+    # print(f"The minimum d to cover all trajectories is {max_min_d}")
     bfs_nodes = set()
     for nodes in bfs_nodes_vec:
         for node in nodes:
@@ -339,27 +344,21 @@ def multiple_minimum_eccentricity_v1(instance):
             graph_nodes.add(node)
 
     diff_nodes = graph_nodes - bfs_nodes
-    print(f"Towers in the original graph = {graph_nodes}")
-    print(f"Only the following towers will be used = {bfs_nodes}")
-    print(f" -> The following towers will be neglected: {diff_nodes}")
+    # print(f"Towers in the original graph = {graph_nodes}")
+    # print(f"Only the following towers will be used = {bfs_nodes}")
+    # print(f" -> The following towers will be neglected: {diff_nodes}")
 
-    universe, collection = create_instance_set_cover(intervals, bfs_nodes)
-    print(f"Universe: {universe}")
-    print("Collection of subsets:")
-    for i in range(0, len(collection)):
-        print(f"Subset {i}:", collection[i])
+    universe, collection, _ = create_instance_set_cover(intervals, bfs_nodes)
+    # print(f"Universe: {universe}")
+    # print("Collection of subsets:")
+    # for i in range(0, len(collection)):
+    #     print(f"Subset {i}:", collection[i])
 
     result = solve_set_cover_APX(universe, collection)
-    print("Selected subsets with index ", result)
-
-    # retrieve the intervals/towers from the output subsets
-    # I_4 [0.00, 446.18]
-    # I_5 [372.18, 590.47]
-    # I_1 [0.00, 458.97]
-    # I_2 [6.88, 511.60]
-
+    # print("Selected subsets with index ", result)
 
     output = {
+        "algorithm": "alg_E_SC_MEPT",
         "eccentricity": max_min_d,
         "used_intervals": result,
     }
@@ -367,13 +366,13 @@ def multiple_minimum_eccentricity_v1(instance):
     return output
 
 
-def multiple_minimum_eccentricity_v2(instance):
+def alg_E_T_MEPT(instance):
     result = []
     max_min_d = 0
     unique_towers = set()
 
     # Call single_minimum_eccentricity function
-    outputs = single_minimum_eccentricity(instance)
+    outputs = alg_E_MEP(instance)
 
     for output in outputs:
         index = output["trajectory"]
@@ -381,7 +380,7 @@ def multiple_minimum_eccentricity_v2(instance):
         max_min_d = max(max_min_d, sol["eccentricity"])
         for interval in sol["used_intervals"]:
             unique_towers.add(interval[2])
-        #single min eccentricity solution, namely MEP
+        # single min eccentricity solution, namely MEP
         # result.append({
         #     "trajectory": index,
         #     "solution": sol
@@ -391,10 +390,10 @@ def multiple_minimum_eccentricity_v2(instance):
     total_unique_towers = len(unique_towers)
 
     output = {
+        "algorithm": "alg_E_T_MEPT",
         "eccentricity": max_min_d,
         "towers": unique_towers,
         "total_towers": total_unique_towers
     }
 
     return output
-
