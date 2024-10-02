@@ -50,7 +50,7 @@ AREA_SIDE = 1000
 #      TOWERS will be set to STAR_EDGES^2 + STAR_EDGES + 1
 #      is connected
 #      can't be fully covered
-SCENARIO = 6
+SCENARIO = 1
 
 TOWERS = 250
 
@@ -65,7 +65,7 @@ LATTICE_NEIGHBORS = 100
 # it must be >= 3
 STAR_EDGES = 5
 
-TRAJECTORIES = 20
+TRAJECTORIES = 100
 
 # In meters, must be less than AREA_SIDE*sqrt(2)
 MIN_DIST_TRAJECTORY = 500
