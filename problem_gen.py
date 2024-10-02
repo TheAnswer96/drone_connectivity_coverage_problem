@@ -505,6 +505,7 @@ def create_RGG_variable_radius(radius_min, radius_max, towers, area_side):
             att = att+1
 
     print("The graph G is not connected.")
+    exit(-1)
 
 
 def create_regular_manhattan(towers, area_side):
