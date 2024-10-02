@@ -1,4 +1,5 @@
 import networkx as nx
+import time
 
 from util import is_zero, is_coverage, get_minimum_cover, solve_set_cover, solve_set_cover_APX
 
@@ -216,6 +217,8 @@ def create_instance_set_cover(intervals, bfs_nodes):
 
 
 def alg_OPT_MEPT(instance):
+    start_time = time.time()
+
     G = instance["graph"]
     intervals = instance["intervals"]
 
@@ -290,8 +293,12 @@ def alg_OPT_MEPT(instance):
         # print(f" T_{t}")
         res.append(t)
 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
     output = {
         "algorithm": "alg_OPT_MEPT",
+        "elapsed_time": round(elapsed_time, 4),
         "eccentricity": max_min_d,
         "towers": towers_out,
         "total_towers": len(towers_out)
@@ -301,6 +308,8 @@ def alg_OPT_MEPT(instance):
 
 
 def alg_E_SC_MEPT(instance):
+    start_time = time.time()
+
     G = instance["graph"]
     intervals = instance["intervals"]
 
@@ -348,7 +357,7 @@ def alg_E_SC_MEPT(instance):
     # print(f"Only the following towers will be used = {bfs_nodes}")
     # print(f" -> The following towers will be neglected: {diff_nodes}")
 
-    universe, collection, _ = create_instance_set_cover(intervals, bfs_nodes)
+    universe, collection, tower_ids = create_instance_set_cover(intervals, bfs_nodes)
     # print(f"Universe: {universe}")
     # print("Collection of subsets:")
     # for i in range(0, len(collection)):
@@ -357,16 +366,35 @@ def alg_E_SC_MEPT(instance):
     result = solve_set_cover_APX(universe, collection)
     # print("Selected subsets with index ", result)
 
+    towers_out = set()
+    for res in result:
+        idx = collection.index(res)
+        towers_out.add(f"T{idx}")
+
+    # print("Selected unique towers")
+    res = []
+    for t in towers_out:
+        # print(f" T_{t}")
+        res.append(t)
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
     output = {
         "algorithm": "alg_E_SC_MEPT",
+        "elapsed_time": round(elapsed_time, 4),
         "eccentricity": max_min_d,
-        "used_intervals": result,
+        # "used_intervals": result,
+        "towers": towers_out,
+        "total_towers": len(towers_out)
     }
 
     return output
 
 
 def alg_E_T_MEPT(instance):
+    start_time = time.time()
+
     result = []
     max_min_d = 0
     unique_towers = set()
@@ -389,8 +417,12 @@ def alg_E_T_MEPT(instance):
     # Total number of unique towers used across all trajectories
     total_unique_towers = len(unique_towers)
 
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
     output = {
         "algorithm": "alg_E_T_MEPT",
+        "elapsed_time": round(elapsed_time, 4),
         "eccentricity": max_min_d,
         "towers": unique_towers,
         "total_towers": total_unique_towers

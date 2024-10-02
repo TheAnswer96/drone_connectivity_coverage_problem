@@ -1,5 +1,5 @@
 import math
-
+import time
 import problem_gen as problem
 from algorithms import *
 from util import is_square
@@ -127,7 +127,12 @@ if __name__ == '__main__':
         }
 
         # Random instance
+        start_time = time.time()
         instance = problem.generate_problem_instance(config)
+        end_time = time.time()
+
+        elapsed_time = end_time - start_time
+        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
 
         # Algorithms
         if ALGORITHM == 0:
