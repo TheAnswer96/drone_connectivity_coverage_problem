@@ -1,8 +1,8 @@
 import math
 import time
 import problem_gen as problem
-from algorithms import *
-from util import is_square, experiments
+from experiments import run_experiments
+from util import is_square
 import argparse
 
 ######################################### HYPER-PARAMETERS #############################################################
@@ -107,7 +107,9 @@ if __name__ == '__main__':
     parser.add_argument("--seed", type=int, default=0, help="Random seed. [Default=0]")
     parser.add_argument("--iterations", type=int, default=25, help="Number of iterations. [Default=25]")
     parser.add_argument("--debug", action='store_true', help="Enable debug mode. [Default=False]")
+
     args = parser.parse_args()
+
     AREA_SIDE = args.area_side
     SCENARIO = args.scenario
     TOWERS = args.towers
@@ -154,7 +156,9 @@ if __name__ == '__main__':
             "star_edges": STAR_EDGES,
             "debug": DEBUG
         }
-    experiments(ITERATIONS, hyper, algorithm)
+
+    run_experiments(ITERATIONS, hyper, ALGORITHM)
+
     # for i in range(1, ITERATIONS+1):
     #     print(f"Iteration {i}/{ITERATIONS}")
     #     # Input parameters

@@ -1,12 +1,11 @@
-import networkx as nx
-import random
-import matplotlib.pyplot as plt
-import numpy as np
 # import sympy as sp
 import math
-from sympy import Polygon, Point
+import random
 
-from util import get_distance, EPSILON, circle_segment_intersection, is_zero
+import matplotlib.pyplot as plt
+import networkx as nx
+
+from util import *
 
 
 def generate_problem_instance(config):
@@ -391,46 +390,6 @@ def create_test(config):
     return tower_points, tower_radii, G
 
 
-def is_covered(dist, intervals):
-    if len(intervals) == 0:
-        return False
-
-    # Step 1: Extract and sort intervals based on "inf" and "sup"
-    sorted_intervals = sorted(intervals, key=lambda x: (x["inf"], x["sup"]))
-
-    # Step 2: Merge overlapping and contiguous intervals
-    min_inf = sorted_intervals[0]["inf"]
-    max_sup = sorted_intervals[0]["sup"]
-
-    # Do this when there is only one interval
-    if len(intervals) == 1:
-        if dist - max_sup > EPSILON:
-            return False
-        if min_inf > EPSILON:
-            return False
-
-    for i in range(1, len(sorted_intervals)):
-
-        # There is a gap immediately, so exit
-        if min_inf > EPSILON:
-            return False
-
-        inf = sorted_intervals[i]["inf"]
-        sup = sorted_intervals[i]["sup"]
-
-        if inf - max_sup > EPSILON:
-            # There is a gap, so exit
-            return False
-        else:
-            max_sup = max(max_sup, sup)
-
-    if dist - max_sup > EPSILON:
-        # There is a gap at the end, so exit
-        return False
-
-    return True
-
-
 def create_RGG_fixed_radius(radius, towers, area_side):
     max_attempts = 1000
     att = 0
@@ -464,7 +423,7 @@ def create_RGG_fixed_radius(radius, towers, area_side):
             print("Attempt: %d - The graph G is connected." % att)
             return tower_points, tower_radii, G
         else:
-            att = att+1
+            att = att + 1
 
     print("The graph G is not connected.")
     exit(-1)
@@ -502,7 +461,7 @@ def create_RGG_variable_radius(radius_min, radius_max, towers, area_side):
             print("Attempt: %d - The graph G is connected." % att)
             return tower_points, tower_radii, G
         else:
-            att = att+1
+            att = att + 1
 
     print("The graph G is not connected.")
     exit(-1)
@@ -513,8 +472,8 @@ def create_regular_manhattan(towers, area_side):
     towers_per_side = math.isqrt(towers) - 1
     gap = int(area_side / towers_per_side)
 
-    for x in range(0, area_side+1, gap):
-        for y in range(0, area_side+1, gap):
+    for x in range(0, area_side + 1, gap):
+        for y in range(0, area_side + 1, gap):
             tower_points.append([x, y])
 
     tower_radii = []
@@ -545,7 +504,7 @@ def create_regular_diagonal(towers, area_side):
             tower_points.append([x, y])
 
     tower_radii = []
-    radius = gap*math.sqrt(2)
+    radius = gap * math.sqrt(2)
     for i in range(0, towers):
         tower_radii.append(radius)
 
@@ -563,7 +522,7 @@ def create_regular_diagonal(towers, area_side):
 
 
 def create_ring_lattice(towers, lattice_neighbors, area_side):
-    r = (2/3.) * area_side / 2
+    r = (2 / 3.) * area_side / 2
     center_x = area_side / 2
     center_y = area_side / 2
 
@@ -599,7 +558,7 @@ def create_ring_lattice(towers, lattice_neighbors, area_side):
 
 def create_star(towers, star_edges, area_side):
     r = area_side / 2
-    rp = r*2./3
+    rp = r * 2. / 3
     center_x = area_side / 2
     center_y = area_side / 2
 
@@ -619,7 +578,7 @@ def create_star(towers, star_edges, area_side):
         tower_points.append((x, y))
         intermediate_points.append((x, y))
 
-    radius = (2/3.) * rp * math.sin(angle_step/2.)
+    radius = (2 / 3.) * rp * math.sin(angle_step / 2.)
 
     # External towers
     for int_x, int_y in intermediate_points:
@@ -638,12 +597,12 @@ def create_star(towers, star_edges, area_side):
         G.add_node(i, pos=tower_points[i])
 
     # Central - Intermediate
-    for i in range(1, star_edges+1):
+    for i in range(1, star_edges + 1):
         G.add_edge(0, i)
 
     # Intermediate - External
     for i in range(1, star_edges + 1):
-        for j in range(star_edges*i + 1, star_edges*(i+1) + 1):
+        for j in range(star_edges * i + 1, star_edges * (i + 1) + 1):
             G.add_edge(i, j)
 
     return tower_points, tower_radii, G
@@ -651,11 +610,11 @@ def create_star(towers, star_edges, area_side):
 
 def create_bus(towers, area_side):
     r = area_side / 2
-    rp = r*2./3
+    rp = r * 2. / 3
     center_x = area_side / 2
     center_y = area_side / 2
 
-    angle_step = 2 * math.pi / (towers-1)
+    angle_step = 2 * math.pi / (towers - 1)
 
     tower_points = []
     intermediate_points = []
@@ -664,14 +623,14 @@ def create_bus(towers, area_side):
     tower_points.append((center_x, center_y))
 
     # Intermediate towers
-    for i in range(towers-1):
+    for i in range(towers - 1):
         angle = i * angle_step
         x = center_x + rp * math.cos(angle)
         y = center_y + rp * math.sin(angle)
         tower_points.append((x, y))
         intermediate_points.append((x, y))
 
-    radius = 2 * rp * math.sin(angle_step/2.)
+    radius = 2 * rp * math.sin(angle_step / 2.)
 
     tower_radii = []
     for i in range(0, towers):

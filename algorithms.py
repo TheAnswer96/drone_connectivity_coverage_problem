@@ -1,7 +1,9 @@
-import networkx as nx
 import time
 
-from util import is_zero, is_coverage, get_minimum_cover, solve_set_cover, solve_set_cover_APX
+import networkx as nx
+
+from util import *
+from util_algorithms import *
 
 
 def alg_E_MEP(instance):
@@ -101,121 +103,6 @@ def alg_C_MTCP(instance):
     return outputs
 
 
-def single_minimum_k_coverage(instance):
-    # TODO
-
-    output = {
-        "result": -1
-    }
-
-    return output
-
-
-def create_instance_set_cover(intervals, bfs_nodes):
-    i = 0
-    for interval in intervals:
-        length = interval["length"]
-        # print(f"Trajectory T_{i} with interval [0, {length:.2f}] and {len(interval['interval'])} towers")
-        endpoints = []
-        for I in interval["interval"]:
-            tower = I["tower"]
-            if tower not in bfs_nodes:
-                continue
-
-            inf = I["inf"]
-            sup = I["sup"]
-            endpoints.append((inf, 'start', tower))
-            endpoints.append((sup, 'end', tower))
-            # print(f"  I_{tower} [{inf:.2f}, {sup:.2f}]")
-
-        endpoints.sort()
-        active_intervals = set()
-        previous_point = None
-        segments = []
-
-        for point, event_type, tower in endpoints:
-            if previous_point is not None and active_intervals:
-                if not is_zero(point - previous_point):
-                    segments.append((previous_point, point, list(active_intervals)))
-
-            if event_type == 'start':
-                active_intervals.add(tower)
-            elif event_type == 'end':
-                active_intervals.remove(tower)
-
-            previous_point = point
-
-        j = 0
-        mini_intervals = []
-        # print(f"The whole interval can be split into {len(segments)} mini intervals")
-        for start, end, active_towers in segments:
-            # print(f"  I_{i}^{j} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
-            mini_interval = {
-                "subscript": i,
-                "superscript": j,
-                "inf": start,
-                "sup": end,
-                "active_towers": active_towers
-            }
-            mini_intervals.append(mini_interval)
-            j = j + 1
-
-        # print(f"The whole interval can be split as follows")
-
-        for I in interval["interval"]:
-            tower = I["tower"]
-            if tower not in bfs_nodes:
-                continue
-
-            for mini_interval in mini_intervals:
-                active_towers = mini_interval["active_towers"]
-                subscript = mini_interval["subscript"]
-                superscript = mini_interval["superscript"]
-
-                for at in active_towers:
-                    if at == tower:
-                        I["mini"].append((subscript, superscript))
-
-        for I in interval["interval"]:
-            tower = I["tower"]
-            if tower not in bfs_nodes:
-                continue
-
-            inf = I["inf"]
-            sup = I["sup"]
-            mini = I["mini"]
-            # print(f"  I_{tower} [{inf:.2f}, {sup:.2f}] -> {mini}")
-
-        # Next iteration
-        i = i + 1
-
-        # print()
-
-    universe = set()
-    collection = []
-    tower_ids = []
-    for interval in intervals:
-        for I in interval["interval"]:
-            tower = I["tower"]
-            if tower not in bfs_nodes:
-                continue
-
-            mini = I["mini"]
-            tmp = set()
-            for m in mini:
-                universe.add(m)
-                tmp.add(m)
-
-            idx = tower_ids.index(tower) if tower in tower_ids else -1
-            if idx != -1:  # If tower exists in the list
-                collection[idx].update(tmp)  # Use update to merge sets
-            else:
-                collection.append(tmp)  # Append the set directly
-                tower_ids.append(tower)
-
-    return universe, collection, tower_ids
-
-
 def alg_OPT_MEPT(instance):
     start_time = time.time()
 
@@ -274,7 +161,7 @@ def alg_OPT_MEPT(instance):
     # for i in range(0, len(collection)):
     #     print(f"Subset {i}:", collection[i])
 
-    result = solve_set_cover(universe, collection)
+    result = solve_set_cover_OPT(universe, collection)
     # print("Selected subsets with index ", result)
     # for i in result:
     #     print(f" Subset {i}:", collection[i])

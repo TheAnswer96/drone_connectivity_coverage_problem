@@ -1,12 +1,6 @@
-import matplotlib.pyplot as plt
-import networkx as nx
 import math
-import gurobipy as gp
-from gurobipy import GRB
-import pandas as pd
-import os
-import time
-import problem_gen as problem
+
+from algorithms import *
 
 EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
 
@@ -61,7 +55,7 @@ def circle_segment_intersection(x0, y0, x1, y1, cx, cy, r):
     return intersection_points
 
 
-def do_intervals_overlap(interval1, interval2):
+def are_intervals_overlap(interval1, interval2):
     start1, end1 = interval1
     start2, end2 = interval2
     return not (end1 < start2 or end2 < start1)
@@ -80,7 +74,7 @@ def create_interval_graph(instance):
         # Add edges between overlapping intervals
         for i in range(len(interval['interval'])):
             for j in range(i + 1, len(interval['interval'])):
-                if do_intervals_overlap(
+                if are_intervals_overlap(
                         [round(interval['interval'][i]['inf'], 2), round(interval['interval'][i]['sup'], 2)],
                         [round(interval['interval'][j]['inf'], 2), round(interval['interval'][j]['sup'], 2)]):
                     G.add_edge(i, j)
@@ -89,12 +83,12 @@ def create_interval_graph(instance):
         G.add_node(-1, interval=[0, 0])
         G.add_node(len(interval['interval']) + 1, interval=[length, length])
         for i in range(len(interval['interval'])):
-            if do_intervals_overlap([0, 0], [round(interval['interval'][i]['inf'], 2),
-                                             round(interval['interval'][i]['sup'], 2)]):
+            if are_intervals_overlap([0, 0], [round(interval['interval'][i]['inf'], 2),
+                                              round(interval['interval'][i]['sup'], 2)]):
                 G.add_edge(-1, i)
-            if do_intervals_overlap([math.floor(length), math.ceil(length)], [round(interval['interval'][i]['inf'], 0),
-                                                                              round(interval['interval'][i]['sup'],
-                                                                                    2)]):
+            if are_intervals_overlap([math.floor(length), math.ceil(length)], [round(interval['interval'][i]['inf'], 0),
+                                                                               round(interval['interval'][i]['sup'],
+                                                                                     2)]):
                 G.add_edge(len(interval['interval']) + 1, i)
         graphs.append(G)
     return graphs
@@ -133,128 +127,146 @@ def get_minimum_cover(cover, length):
     return sol
 
 
-def solve_set_cover(universe, collection):
-    # Create a new model
-    model = gp.Model("SetCover")
-    model.setParam('OutputFlag', False)
+def is_covered(dist, intervals):
+    if len(intervals) == 0:
+        return False
 
-    # Create variables: x[j] is 1 if subset j is in the cover, 0 otherwise
-    x = model.addVars(len(collection), vtype=GRB.BINARY, name="x")
+    # Step 1: Extract and sort intervals based on "inf" and "sup"
+    sorted_intervals = sorted(intervals, key=lambda x: (x["inf"], x["sup"]))
 
-    # Set objective: minimize the number of subsets in the cover
-    model.setObjective(gp.quicksum(x[j] for j in range(len(collection))), GRB.MINIMIZE)
+    # Step 2: Merge overlapping and contiguous intervals
+    min_inf = sorted_intervals[0]["inf"]
+    max_sup = sorted_intervals[0]["sup"]
 
-    # Add constraints: each element in the universe must be covered by at least one subset
-    for element in universe:
-        model.addConstr(gp.quicksum(x[j] for j in range(len(collection)) if element in collection[j]) >= 1,
-                        name=f"Cover_{element}")
+    # Do this when there is only one interval
+    if len(intervals) == 1:
+        if dist - max_sup > EPSILON:
+            return False
+        if min_inf > EPSILON:
+            return False
 
-    # Optimize the model
-    model.optimize()
+    for i in range(1, len(sorted_intervals)):
 
-    # Get the result
-    selected_subsets = [j for j in range(len(collection)) if x[j].x > 0.5]
+        # There is a gap immediately, so exit
+        if min_inf > EPSILON:
+            return False
 
-    return selected_subsets
+        inf = sorted_intervals[i]["inf"]
+        sup = sorted_intervals[i]["sup"]
 
+        if inf - max_sup > EPSILON:
+            # There is a gap, so exit
+            return False
+        else:
+            max_sup = max(max_sup, sup)
 
-def solve_set_cover_APX(universe, collection):
-    # APX: greedy algorithm that selects at every step the collection with the maximum coverage until the universe is covered
-    uncovered = universe.copy()
-    selected_collections_index = []
-    selected_collections = []
+    if dist - max_sup > EPSILON:
+        # There is a gap at the end, so exit
+        return False
 
-    # print("Initial Universe:", universe)
-    # print("Initial Collection:", collection)
-
-    while uncovered:
-        best = None
-        best_index = -1
-        max_cover = 0
-        for index, col in enumerate(collection):
-            intersection = uncovered & col
-            intersection_size = len(intersection)
-            # print(f"Subset {index}: {col}, Covers {intersection_size} uncovered elements")
-            if intersection_size > max_cover:
-                max_cover = intersection_size
-                best = col
-                best_index = index
-        if max_cover == 0:
-            # print("No subset can cover any more uncovered elements.")
-            break
-        selected_collections_index.append(best_index)
-        selected_collections.append(best)
-        uncovered = uncovered - best
-        # print(f"\nSelected Subset {best_index}: {best}")
-        # print(f"Uncovered Elements Remaining: {uncovered}\n")
-
-    # print("Selected Subsets Indices:", selected_collections_index)
-    # print("Selected Subsets Collections:", selected_collections)
-    return selected_collections
+    return True
 
 
-def experiments(iterations, hyperparams):
-    if not os.path.exists("./exp"):
-        print("exp directory creation.")
-        os.makedirs("./exp")
+def create_instance_set_cover(intervals, bfs_nodes):
+    i = 0
+    for interval in intervals:
+        length = interval["length"]
+        # print(f"Trajectory T_{i} with interval [0, {length:.2f}] and {len(interval['interval'])} towers")
+        endpoints = []
+        for I in interval["interval"]:
+            tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
 
-    for i in range(1, iterations+1):
-        print(f"Iteration {i}/{iterations}")
-        # Input parameters
-        config = {
-            "area_side": hyperparams["area_side"],
-            "towers": hyperparams["towers"],
-            "radius_min": hyperparams["radius_min"],
-            "radius_max": hyperparams["radius_max"],
-            "trajectories": hyperparams["trajectories"],
-            "min_dist_trajectory": hyperparams["min_dist_trajectory"],
-            "scenario": hyperparams["scenario"],
-            "lattice_neighbors": hyperparams["lattice_neighbors"],
-            "star_edges": hyperparams["star_edges"],
-            "seed": i,
-            "debug": hyperparams["debug"]
-        }
+            inf = I["inf"]
+            sup = I["sup"]
+            endpoints.append((inf, 'start', tower))
+            endpoints.append((sup, 'end', tower))
+            # print(f"  I_{tower} [{inf:.2f}, {sup:.2f}]")
 
-        # Random instance
-        start_time = time.time()
-        instance = problem.generate_problem_instance(config)
-        end_time = time.time()
+        endpoints.sort()
+        active_intervals = set()
+        previous_point = None
+        segments = []
 
-        elapsed_time = end_time - start_time
-        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+        for point, event_type, tower in endpoints:
+            if previous_point is not None and active_intervals:
+                if not is_zero(point - previous_point):
+                    segments.append((previous_point, point, list(active_intervals)))
 
-        # Algorithms
-        if ALGORITHM == 0:
-            # Minimum Eccentricity Problem - MEP
-            output = alg_E_MEP(instance)
-            print(output)
-        # elif ALGORITHM == 1:
-        #     # MEP-k
-        #     output = single_minimum_k_coverage(instance)
-        #     print(output)
-            exit(1)
-        elif ALGORITHM == 2:
-            # Minimum Tower Coverage Problem - MTCP
-            output = alg_C_MTCP(instance)
-            print(output)
-        elif ALGORITHM == 3:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_OPT_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 4:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_E_SC_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 5:
-            # Minimum Eccentricity Problem with multiple Trajectories - MEPT
-            output = alg_E_T_MEPT(instance)
-            print(output)
-        elif ALGORITHM == 6:
-            output_v1 = alg_E_SC_MEPT(instance)
-            print(output_v1)
-            output_v2 = alg_E_T_MEPT(instance)
-            print(output_v2)
-            output_opt = alg_OPT_MEPT(instance)
-            print(output_opt)
-            print("########################")
-    return
+            if event_type == 'start':
+                active_intervals.add(tower)
+            elif event_type == 'end':
+                active_intervals.remove(tower)
+
+            previous_point = point
+
+        j = 0
+        mini_intervals = []
+        # print(f"The whole interval can be split into {len(segments)} mini intervals")
+        for start, end, active_towers in segments:
+            # print(f"  I_{i}^{j} -> [{start:.2f}, {end:.2f}], towers {active_towers}")
+            mini_interval = {
+                "subscript": i,
+                "superscript": j,
+                "inf": start,
+                "sup": end,
+                "active_towers": active_towers
+            }
+            mini_intervals.append(mini_interval)
+            j = j + 1
+
+        # print(f"The whole interval can be split as follows")
+
+        for I in interval["interval"]:
+            tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
+            for mini_interval in mini_intervals:
+                active_towers = mini_interval["active_towers"]
+                subscript = mini_interval["subscript"]
+                superscript = mini_interval["superscript"]
+
+                for at in active_towers:
+                    if at == tower:
+                        I["mini"].append((subscript, superscript))
+
+        for I in interval["interval"]:
+            tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
+            inf = I["inf"]
+            sup = I["sup"]
+            mini = I["mini"]
+            # print(f"  I_{tower} [{inf:.2f}, {sup:.2f}] -> {mini}")
+
+        # Next iteration
+        i = i + 1
+
+        # print()
+
+    universe = set()
+    collection = []
+    tower_ids = []
+    for interval in intervals:
+        for I in interval["interval"]:
+            tower = I["tower"]
+            if tower not in bfs_nodes:
+                continue
+
+            mini = I["mini"]
+            tmp = set()
+            for m in mini:
+                universe.add(m)
+                tmp.add(m)
+
+            idx = tower_ids.index(tower) if tower in tower_ids else -1
+            if idx != -1:  # If tower exists in the list
+                collection[idx].update(tmp)  # Use update to merge sets
+            else:
+                collection.append(tmp)  # Append the set directly
+                tower_ids.append(tower)
+
+    return universe, collection, tower_ids
