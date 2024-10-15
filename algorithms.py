@@ -193,7 +193,6 @@ def alg_OPT_MEPT(instance):
 
     return output
 
-
 def alg_E_SC_MEPT(instance):
     start_time = time.time()
 
