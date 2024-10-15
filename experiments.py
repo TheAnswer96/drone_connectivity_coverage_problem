@@ -155,6 +155,9 @@ def run_experiments_paper():
                     print("dummy star settled!")
                     star_edges = [5]
                 for r_min in radius_min:
+                    if scenario == 1:
+                        radius_max = [300]
+                        print("dummy max radius settled!")
                     for r_max in radius_max:
                         for trj in trajectories:
                             for lattice in lattice_neighbors:
