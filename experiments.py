@@ -1,9 +1,10 @@
 import os
 import time
+import pandas as pd
 
 import problem_gen as problem
 from algorithms import *
-import pandas as pd
+
 
 #  1 - RGG with fixed r
 #      considers only RADIUS_MIN
@@ -156,56 +157,69 @@ def run_experiments_paper():
                 for r_min in radius_min:
                     for r_max in radius_max:
                         for trj in trajectories:
-                            for min_dist in min_dist_trajectory:
-                                for lattice in lattice_neighbors:
-                                    for star in star_edges:
+                            for lattice in lattice_neighbors:
+                                for star in star_edges:
+                                    for min_traj in min_dist_trajectory:
 
-                                        #             alg_E_SC_MEPT(instance)
-                                        #             alg_E_T_MEPT(instance)
-                                        #             alg_OPT_MEPT(instance)
+                                        results = pd.DataFrame(
+                                            columns=["iteration_seed", "time_opt", "eccentricity_opt",
+                                                     "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept",
+                                                     "total_towers_e_sc_mept", "time_e_t_mept",
+                                                     "eccentricity_e_t_mept", "total_towers_e_t_mept"])
 
-                                        for min_traj in min_dist_trajectory:
-                                            results = pd.DataFrame(
-                                                columns=["iteration_seed", "time_opt", "eccentricity_opt",
-                                                         "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept",
-                                                         "total_towers_e_sc_mept",
-                                                         "time_e_t_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                                                         "total_towers_e_t_mept"])
+                                        destination = "./exp/"+dir_dict[scenario]+"/results_ar"+str(area)+"_t"+\
+                                                      str(tower)+"_rn" + str(r_min) + "_rx"+str(r_max) + "_tr" +\
+                                                    str(trj) + "_di"+str(min_traj) + "_l"+str(lattice)+"_s"+str(star) + ".csv"
 
-                                            destination = "./exp/"+dir_dict[scenario]+"/results_ar"+str(area)+"_t"+\
-                                                          str(tower)+"_rn" + str(r_min) + "_rx"+str(r_max) + "_tr" +\
-                                                        str(trj) + "_di"+str(min_traj) + "_l"+str(lattice)+"_s"+str(star) + ".csv"
-                                            for i in range(1, iterations):
-                                                tower, lattice, star = problem.preprocessing_scenario(scenario, tower, lattice, star)
-                                                print(f"Iteration {i}/{iterations}")
-                                                config = {
-                                                            "area_side": area,
-                                                            "towers": tower,
-                                                            "radius_min": r_min,
-                                                            "radius_max": r_max,
-                                                            "trajectories": trj,
-                                                            "min_dist_trajectory": min_traj,
-                                                            "scenario": scenario,
-                                                            "lattice_neighbors": lattice,
-                                                            "star_edges": star,
-                                                            "seed": i,
-                                                            "debug": debug
-                                                        }
+                                        print(f"Instance - Area: {area}, Tower: {tower}, Scenario: {scenario}, "
+                                              f"R_min: {r_min}, R_max: {r_max}, Trajectory: {trj}, "
+                                              f"Lattice: {lattice}, Star: {star}, Min Trajectory: {min_traj}")
+                                        for i in range(1, iterations):
+                                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, lattice, star)
+                                            print(f"Iteration {i}/{iterations}")
+                                            config = {
+                                                        "area_side": area,
+                                                        "towers": tower,
+                                                        "radius_min": r_min,
+                                                        "radius_max": r_max,
+                                                        "trajectories": trj,
+                                                        "min_dist_trajectory": min_traj,
+                                                        "scenario": scenario,
+                                                        "lattice_neighbors": lattice,
+                                                        "star_edges": star,
+                                                        "seed": i,
+                                                        "debug": debug
+                                                    }
 
-                                                # Random instance
-                                                start_time = time.time()
-                                                instance = problem.generate_problem_instance(config)
-                                                end_time = time.time()
+                                            # Random instance
+                                            start_time = time.time()
+                                            instance = problem.generate_problem_instance(config)
+                                            end_time = time.time()
 
-                                                elapsed_time = end_time - start_time
-                                                print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
-                                                output_opt = alg_OPT_MEPT(instance)
-                                                output_v1 = alg_E_SC_MEPT(instance)
-                                                output_v2 = alg_E_T_MEPT(instance)
-                                                result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"], output_opt["total_towers"],
-                                                              output_v1["elapsed_time"], output_v1["eccentricity"], output_v1["total_towers"],
-                                                              output_v2["elapsed_time"], output_v2["eccentricity"], output_v2["total_towers"],
-                                                              ]
-                                                results.loc[len(results)] = result_row
-                                            results.to_csv(destination)
+                                            elapsed_time = end_time - start_time
+                                            print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                                            output_opt = alg_OPT_MEPT(instance)
+                                            output_v1 = alg_E_SC_MEPT(instance)
+                                            output_v2 = alg_E_T_MEPT(instance)
+                                            result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"], output_opt["total_towers"],
+                                                          output_v1["elapsed_time"], output_v1["eccentricity"], output_v1["total_towers"],
+                                                          output_v2["elapsed_time"], output_v2["eccentricity"], output_v2["total_towers"],
+                                                          ]
+                                            results.loc[len(results)] = result_row
+                                        results.to_csv(destination)
+    return
+
+
+def visualize_exp_paper():
+    exp_folder = "exp"
+
+    scenarions_folder = os.listdir(exp_folder)
+
+    for dir in scenarions_folder:
+        current_path = os.path.join(exp_folder, dir)
+        files = os.listdir(current_path)
+        files.remove('img')
+        for file in files:
+            current_file = os.path.join(current_path, file)
+            plot_experiment_results(current_file)
     return

@@ -1,6 +1,10 @@
 import math
 
-from algorithms import *
+import networkx as nx
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+# from algorithms import *
 
 EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
 
@@ -270,3 +274,53 @@ def create_instance_set_cover(intervals, bfs_nodes):
                 tower_ids.append(tower)
 
     return universe, collection, tower_ids
+
+
+def plot_experiment_results(csv_path):
+    data = pd.read_csv(csv_path)
+
+    parent_dir = os.path.dirname(os.path.abspath(csv_path))
+    img_folder = os.path.join(parent_dir, 'img')
+    os.makedirs(img_folder, exist_ok=True)
+
+    base_filename = os.path.splitext(os.path.basename(csv_path))[0]
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 15))
+
+    axes[0].set_title('Eccentricity over Iterations')
+    axes[1].set_title('Total Towers over Iterations')
+    axes[2].set_title('Time over Iterations')
+
+    x = data['iteration_seed']
+
+    # Plot eccentricity
+    axes[0].plot(x, data['eccentricity_opt'], label='Opt', color='blue')
+    axes[0].plot(x, data['eccentricity_e_sc_mept'], label='SC MEPT', color='green')
+    axes[0].plot(x, data['eccentricity_e_t_mept'], label='T MEPT', color='red')
+    axes[0].set_ylabel('Eccentricity')
+    axes[0].legend()
+
+    # Plot total towers
+    axes[1].plot(x, data['total_towers_opt'], label='Opt', color='blue')
+    axes[1].plot(x, data['total_towers_e_sc_mept'], label='SC MEPT', color='green')
+    axes[1].plot(x, data['total_towers_e_t_mept'], label='T MEPT', color='red')
+    axes[1].set_ylabel('Total Towers')
+    axes[1].legend()
+
+    # Plot time
+    axes[2].plot(x, data['time_opt'], label='Opt', color='blue')
+    axes[2].plot(x, data['time_e_sc_mept'], label='SC MEPT', color='green')
+    axes[2].plot(x, data['time_e_t_mept'], label='T MEPT', color='red')
+    axes[2].set_ylabel('Time')
+    axes[2].set_xlabel('Iteration Seed')
+    axes[2].legend()
+
+    plt.tight_layout()
+
+    img_path = os.path.join(img_folder, f'{base_filename}.png')
+    plt.savefig(img_path)
+
+
+    # plt.show()
+
+    print(f"Plot saved to {img_path}")
