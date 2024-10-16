@@ -160,5 +160,5 @@ if __name__ == '__main__':
     # run_experiments(ITERATIONS, hyper, ALGORITHM)
 
     #Run this function for exhaustive tests
-    # run_experiments_paper()
-    visualize_exp_paper()
+    run_experiments_paper()
+    # visualize_exp_paper()
