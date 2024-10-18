@@ -131,10 +131,10 @@ def run_experiments_paper():
     # radius_max = [300]
     lattice_neighbors = [2, 4, 6] #2, 4, 6
     star_edges = [5, 10] #5, 10
-    trajectories = [1, 10, 20, 50, 100] #1, 10, 20, 50, 100
+    trajectories = [1, 2] #1, 10, 20, 50, 100
     min_dist_trajectory = [int(area/3*2) for area in area_sides] #2/3 area side
     iterations = 33
-    # debug = False
+    debug = False
 
     if not os.path.exists("./exp"):
         print("exp directory creation.")
@@ -146,22 +146,22 @@ def run_experiments_paper():
             print(pth, " directory creation.")
             os.makedirs(pth)
         if scene == 1:
-            run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
         if scene == 2:
-            run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
         if scene == 3:
-            run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
         if scene == 4:
-            run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
         if scene == 5:
             raise "not yet implemented!"
         if scene == 6:
-            run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
         if scene == 7:
-            run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict)
+            run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
     return
 
-def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
+def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept", "total_towers_e_t_mept"])
 
     print(f"RGG with fixed radius staterted...")
@@ -174,7 +174,7 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
                         # creazione path di salvataggio
                         destination = get_exp_name(1, min_rad, 0, tower, area, 0, 0, n, size, dict_sc)
                         for i in range(1, iterations):
-                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+                            tower, lattice, star = problem.preprocessing_scenario(1, tower, 0, 0)
 
                             print(f"Iteration {i}/{iterations}")
                             config = {
@@ -210,12 +210,12 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
                                           output_v2["elapsed_time"], output_v2["eccentricity"],
                                           output_v2["total_towers"],
                                           ]
-                            output.loc[len(results)] = result_row
+                            output.loc[len(output)] = result_row
                         output.to_csv(destination)
     print(f"RGG with fixed radius completed.")
     return
 
-def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
+def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(
         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
@@ -231,7 +231,7 @@ def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_s
                         # creazione path di salvataggio
                         destination = get_exp_name(2, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
                         for i in range(1, iterations):
-                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+                            tower, lattice, star = problem.preprocessing_scenario(2, tower, 0, 0)
 
                             print(f"Iteration {i}/{iterations}")
                             config = {
@@ -267,12 +267,12 @@ def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_s
                                           output_v2["elapsed_time"], output_v2["eccentricity"],
                                           output_v2["total_towers"],
                                           ]
-                            output.loc[len(results)] = result_row
+                            output.loc[len(output)] = result_row
                         output.to_csv(destination)
     print(f"RGG with variable radius completed.")
     return
 
-def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc):
+def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(
         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
@@ -287,7 +287,7 @@ def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc
                     # creazione path di salvataggio
                     destination = get_exp_name(3, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
                     for i in range(1, iterations):
-                        tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+                        tower, lattice, star = problem.preprocessing_scenario(3, tower, 0, 0)
 
                         print(f"Iteration {i}/{iterations}")
                         config = {
@@ -323,12 +323,12 @@ def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc
                                       output_v2["elapsed_time"], output_v2["eccentricity"],
                                       output_v2["total_towers"],
                                       ]
-                        output.loc[len(results)] = result_row
+                        output.loc[len(output)] = result_row
                     output.to_csv(destination)
     print(f"Regular Manhattan completed.")
     return
 
-def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc):
+def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(
         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
@@ -343,7 +343,7 @@ def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc)
                     # creazione path di salvataggio
                     destination = get_exp_name(4, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
                     for i in range(1, iterations):
-                        tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+                        tower, lattice, star = problem.preprocessing_scenario(4, tower, 0, 0)
 
                         print(f"Iteration {i}/{iterations}")
                         config = {
@@ -379,12 +379,12 @@ def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc)
                                       output_v2["elapsed_time"], output_v2["eccentricity"],
                                       output_v2["total_towers"],
                                       ]
-                        output.loc[len(results)] = result_row
+                        output.loc[len(output)] = result_row
                     output.to_csv(destination)
     print(f"Regular Diagonal completed.")
     return
 
-def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc):
+def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(
         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
@@ -400,7 +400,7 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
                         # creazione path di salvataggio
                         destination = get_exp_name(6, min_rad, max_rad, tower, area, l, 0, n, size, dict_sc)
                         for i in range(1, iterations):
-                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, l, 0)
+                            tower, lattice, star = problem.preprocessing_scenario(6, tower, l, 0)
 
                             print(f"Iteration {i}/{iterations}")
                             config = {
@@ -436,12 +436,12 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
                                           output_v2["elapsed_time"], output_v2["eccentricity"],
                                           output_v2["total_towers"],
                                           ]
-                            output.loc[len(results)] = result_row
+                            output.loc[len(output)] = result_row
                         output.to_csv(destination)
     print(f"Lattice completed.")
     return
 
-def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc):
+def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debug):
     output = pd.DataFrame(
         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
@@ -457,7 +457,7 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc):
                         # creazione path di salvataggio
                         destination = get_exp_name(7, min_rad, max_rad, tower, area, 0, s, n, size, dict_sc)
                         for i in range(1, iterations):
-                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, s)
+                            tower, lattice, star = problem.preprocessing_scenario(7, tower, 0, s)
 
                             print(f"Iteration {i}/{iterations}")
                             config = {
@@ -493,7 +493,7 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc):
                                           output_v2["elapsed_time"], output_v2["eccentricity"],
                                           output_v2["total_towers"],
                                           ]
-                            output.loc[len(results)] = result_row
+                            output.loc[len(output)] = result_row
                         output.to_csv(destination)
     print(f"Lattice completed.")
     return
