@@ -646,24 +646,29 @@ def create_bus(towers, area_side):
 
     return tower_points, tower_radii, G
 
+
 def preprocessing_scenario(scenario, towers, lattice_neigh, star_edges):
     if scenario == 3 or scenario == 4:
-        if not is_square(scenario):
-            towers = (math.isqrt(scenario) + 1) ** 2
+        if not is_square(towers):
+            towers = (math.isqrt(towers) + 1) ** 2
 
     if scenario == 6:
         if towers < 3:
             towers = 3
 
-        if LATTICE_NEIGHBORS % 2 == 1:
+        if lattice_neigh % 2 == 1:
             lattice_neigh = lattice_neigh - 1
 
-        if LATTICE_NEIGHBORS < 2:
+        if lattice_neigh < 2:
             lattice_neigh = 2
 
-        # if lattice_neigh > towers / 2:
-        #     lattice_neigh = towers / 2
+        if lattice_neigh > towers / 2:
+            lattice_neigh = int(towers / 2)
+            if lattice_neigh % 2 == 1:
+                lattice_neigh = lattice_neigh - 1
 
     if scenario == 7:
         towers = star_edges**2 + star_edges + 1
+
     return towers, lattice_neigh, star_edges
+
