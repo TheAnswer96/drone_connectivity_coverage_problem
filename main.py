@@ -160,5 +160,10 @@ if __name__ == '__main__':
     # run_experiments(ITERATIONS, hyper, ALGORITHM)
 
     #Run this function for exhaustive tests
-    run_experiments_paper()
+
+    scenarios = [1, 2, 3, 4, 6, 7]
+    for scenario in scenarios:
+        run_experiments_paper(scenario)
+
+
     # visualize_exp_paper()

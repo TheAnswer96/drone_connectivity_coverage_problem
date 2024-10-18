@@ -122,66 +122,50 @@ dir_dict = {
 #     return
 
 
-def run_experiments_paper():
-    #### Parameters
-    area_sides = [1000]
-
-    # RGG fixed
-    # scenarios = [1]
-    # towers = [50, 100, 200, 350]
-    # radius = [(100, 300), (150, 300), (200, 300), (250, 300)]
-
-    # RGG variable
-    # scenarios = [2]
-    # towers = [50, 100, 200, 350]
-    # radius = [(100, 300), (150, 300), (200, 300), (250, 300)]
-
-    # Manhattan
-    # scenarios = [3]
-    # towers = [4**2, 6**2, 7**2, 8**2, 10**2, 12**2, 14**2, 15**2, 16**2]
-
-    # Diagonal
-    # scenarios = [4]
-    # towers = [4**2, 6**2, 7**2, 8**2, 10**2, 12**2, 14**2, 15**2, 16**2]
-
-    # Lattice
-    # scenarios = [6]
-    # towers = [5, 10, 15, 20]
-    # lattice_neighbors = [2, 4, 6]
-
-    # Star
-    scenarios = [7]
-    star_edges = [5, 7, 10, 12]
-    towers = [-1]
-
-    trajectories = [1, 2]  # 1, 10, 20, 50, 100
-    min_dist_trajectory = [int(area/3*2) for area in area_sides]  # 2/3 area side
-    iterations = 33
-    debug = False
-
+def run_experiments_paper(scene):
     if not os.path.exists("./exp"):
         print("exp directory creation.")
         os.makedirs("./exp")
 
-    for scene in scenarios:
-        pth = "./exp/"+dir_dict[scene]
-        if not os.path.exists(pth):
-            print(pth, " directory creation.")
-            os.makedirs(pth)
-        if scene == 1:
-            run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
-        if scene == 2:
-            run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
-        if scene == 3:
-            run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
-        if scene == 4:
-            run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
-        if scene == 5:
-            raise "not yet implemented!"
-        if scene == 6:
-            run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
-        if scene == 7:
-            run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    pth = "./exp/"+dir_dict[scene]
+    if not os.path.exists(pth):
+        print(pth, " directory creation.")
+        os.makedirs(pth)
+
+    #### Parameters
+    area_sides = [1000]
+    min_dist_trajectory = [int(area/3*2) for area in area_sides]  # 2/3 area side
+
+    trajectories = [1, 10, 20, 50, 100]
+
+    iterations = 33
+    debug = False
+
+    if scene == 1:
+        towers = [50, 100, 200, 350]
+        radius = [100, 150, 200, 250, 300]
+        run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    elif scene == 2:
+        towers = [50, 100, 200, 350]
+        radius = [(100, 300), (150, 300), (200, 300), (250, 300)]
+        run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    elif scene == 3:
+        towers = [4**2, 6**2, 7**2, 8**2, 10**2, 12**2, 14**2, 15**2, 16**2]
+        run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    elif scene == 4:
+        towers = [4**2, 6**2, 7**2, 8**2, 10**2, 12**2, 14**2, 15**2, 16**2]
+        run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    elif scene == 5:
+        raise "not yet implemented!"
+    elif scene == 6:
+        towers = [5, 10, 15, 20]
+        lattice_neighbors = [2, 4, 6]
+        run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+    elif scene == 7:
+        star_edges = [5, 7, 10, 12]
+        towers = [-1]
+        run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
     return
 
 
@@ -191,15 +175,15 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, 
     print(f"RGG with fixed radius started...")
     for area in areas:
         for tower in towers:
-            for min_rad, _ in rads:
+            for rad in rads:
                 for n in n_traj:
                     for size in traj_sizes:
-                        if (tower < 100 and min_rad < 200) or (tower < 150 and min_rad < 150):
+                        if (tower < 100 and rad < 200) or (tower < 150 and rad < 150):
                             continue
 
-                        print(f"exp area {area}, towers {tower}, rad {min_rad}, n traj {n}, min traj size {size}.")
+                        print(f"exp area {area}, towers {tower}, rad {rad}, n traj {n}, min traj size {size}.")
                         # creazione path di salvataggio
-                        destination = get_exp_name(1, min_rad, 0, tower, area, 0, 0, n, size, dict_sc)
+                        destination = get_exp_name(1, rad, 0, tower, area, 0, 0, n, size, dict_sc)
                         for i in range(1, iterations+1):
                             tower, lattice, star = problem.preprocessing_scenario(1, tower, 0, 0)
 
@@ -207,7 +191,7 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, 
                             config = {
                                 "area_side": area,
                                 "towers": tower,
-                                "radius_min": min_rad,
+                                "radius_min": rad,
                                 "radius_max": 0,
                                 "trajectories": n,
                                 "min_dist_trajectory": size,
