@@ -4,7 +4,7 @@ import pandas as pd
 
 import problem_gen as problem
 from algorithms import *
-
+from util import get_exp_name
 
 #  1 - RGG with fixed r
 #      considers only RADIUS_MIN
@@ -123,18 +123,18 @@ dir_dict = {
 
 def run_experiments_paper():
     #### Parameters
-    area_sides = [500]
-    towers = [50, 100, 200, 350]
-    scenarios = [2]
-    radius = [(100,300)]
+    area_sides = [1000, 2000] #1000 o 2000
+    towers = [50, 100, 200, 350] #RGG
+    scenarios = [1, 2]
+    radius = [(100, 300)]
     # radius_min = [100]
     # radius_max = [300]
-    lattice_neighbors = [100]
-    star_edges = [5]
-    trajectories = [10, 20, 50, 100]
-    min_dist_trajectory = [500]
+    lattice_neighbors = [2, 4, 6] #2, 4, 6
+    star_edges = [5, 10] #5, 10
+    trajectories = [1, 10, 20, 50, 100] #1, 10, 20, 50, 100
+    min_dist_trajectory = [int(area/3*2) for area in area_sides] #2/3 area side
     iterations = 33
-    debug = False
+    # debug = False
 
     if not os.path.exists("./exp"):
         print("exp directory creation.")
@@ -145,76 +145,358 @@ def run_experiments_paper():
         if not os.path.exists(pth):
             print(pth, " directory creation.")
             os.makedirs(pth)
-
-    for area in area_sides:
-        for tower in towers:
-            for scenario in scenarios:
-                if scenario !=6:
-                    print("dummy lattice settled!")
-                    lattice_neighbors = [500]
-                if scenario != 7:
-                    print("dummy star settled!")
-                    star_edges = [5]
-                # for r_min in radius_min:
-                for r_min, r_max in radius:
-                    if scenario == 1:
-                        radius_max = [300]
-                        print("dummy max radius settled!")
-                    # for r_max in radius_max:
-                    for trj in trajectories:
-                        for lattice in lattice_neighbors:
-                            for star in star_edges:
-                                for min_traj in min_dist_trajectory:
-
-                                    results = pd.DataFrame(
-                                        columns=["iteration_seed", "time_opt", "eccentricity_opt",
-                                                 "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept",
-                                                 "total_towers_e_sc_mept", "time_e_t_mept",
-                                                 "eccentricity_e_t_mept", "total_towers_e_t_mept"])
-
-                                    destination = "./exp/"+dir_dict[scenario]+"/results_ar"+str(area)+"_t"+\
-                                                  str(tower)+"_rn" + str(r_min) + "_rx"+str(r_max) + "_tr" +\
-                                                str(trj) + "_di"+str(min_traj) + "_l"+str(lattice)+"_s"+str(star) + ".csv"
-
-                                    print(f"Instance - Area: {area}, Tower: {tower}, Scenario: {scenario}, "
-                                          f"R_min: {r_min}, R_max: {r_max}, Trajectory: {trj}, "
-                                          f"Lattice: {lattice}, Star: {star}, Min Trajectory: {min_traj}")
-                                    for i in range(1, iterations):
-                                        tower, lattice, star = problem.preprocessing_scenario(scenario, tower, lattice, star)
-                                        print(f"Iteration {i}/{iterations}")
-                                        config = {
-                                                    "area_side": area,
-                                                    "towers": tower,
-                                                    "radius_min": r_min,
-                                                    "radius_max": r_max,
-                                                    "trajectories": trj,
-                                                    "min_dist_trajectory": min_traj,
-                                                    "scenario": scenario,
-                                                    "lattice_neighbors": lattice,
-                                                    "star_edges": star,
-                                                    "seed": i,
-                                                    "debug": debug
-                                                }
-
-                                        # Random instance
-                                        start_time = time.time()
-                                        instance = problem.generate_problem_instance(config)
-                                        end_time = time.time()
-
-                                        elapsed_time = end_time - start_time
-                                        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
-                                        output_opt = alg_OPT_MEPT(instance)
-                                        output_v1 = alg_E_SC_MEPT(instance)
-                                        output_v2 = alg_E_T_MEPT(instance)
-                                        result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"], output_opt["total_towers"],
-                                                      output_v1["elapsed_time"], output_v1["eccentricity"], output_v1["total_towers"],
-                                                      output_v2["elapsed_time"], output_v2["eccentricity"], output_v2["total_towers"],
-                                                      ]
-                                        results.loc[len(results)] = result_row
-                                    results.to_csv(destination)
+        if scene == 1:
+            run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict)
+        if scene == 2:
+            run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict)
+        if scene == 3:
+            run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict)
+        if scene == 4:
+            run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict)
+        if scene == 5:
+            raise "not yet implemented!"
+        if scene == 6:
+            run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict)
+        if scene == 7:
+            run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict)
     return
 
+def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept", "total_towers_e_t_mept"])
 
+    print(f"RGG with fixed radius staterted...")
+    for area in areas:
+        for tower in towers:
+            for min_rad, _ in rads:
+                for n in n_traj:
+                    for size in traj_sizes:
+                        print(f"exp area {area}, towers {tower}, min rad {min_rad}, n traj {n}, traj size {size}.")
+                        # creazione path di salvataggio
+                        destination = get_exp_name(1, min_rad, 0, tower, area, 0, 0, n, size, dict_sc)
+                        for i in range(1, iterations):
+                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+
+                            print(f"Iteration {i}/{iterations}")
+                            config = {
+                                "area_side": area,
+                                "towers": tower,
+                                "radius_min": min_rad,
+                                "radius_max": 0,
+                                "trajectories": n,
+                                "min_dist_trajectory": size,
+                                "scenario": 1,
+                                "lattice_neighbors": 0,
+                                "star_edges": 0,
+                                "seed": i,
+                                "debug": debug
+                            }
+
+                            # Random instance
+                            start_time = time.time()
+                            instance = problem.generate_problem_instance(config)
+                            end_time = time.time()
+
+                            elapsed_time = end_time - start_time
+                            print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                            output_opt = alg_OPT_MEPT(instance)
+                            output_v1 = alg_E_SC_MEPT(instance)
+                            output_v2 = alg_E_T_MEPT(instance)
+                            print(
+                                f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                            result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                          output_opt["total_towers"],
+                                          output_v1["elapsed_time"], output_v1["eccentricity"],
+                                          output_v1["total_towers"],
+                                          output_v2["elapsed_time"], output_v2["eccentricity"],
+                                          output_v2["total_towers"],
+                                          ]
+                            output.loc[len(results)] = result_row
+                        output.to_csv(destination)
+    print(f"RGG with fixed radius completed.")
+    return
+
+def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(
+        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
+                 "total_towers_e_t_mept"])
+
+    print(f"RGG with variable radius staterted...")
+    for area in areas:
+        for tower in towers:
+            for min_rad, max_rad in rads:
+                for n in n_traj:
+                    for size in traj_sizes:
+                        print(f"exp area {area}, towers {tower}, rad ({min_rad},{max_rad}), n traj {n}, traj size {size}.")
+                        # creazione path di salvataggio
+                        destination = get_exp_name(2, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
+                        for i in range(1, iterations):
+                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+
+                            print(f"Iteration {i}/{iterations}")
+                            config = {
+                                "area_side": area,
+                                "towers": tower,
+                                "radius_min": min_rad,
+                                "radius_max": max_rad,
+                                "trajectories": n,
+                                "min_dist_trajectory": size,
+                                "scenario": 2,
+                                "lattice_neighbors": 0,
+                                "star_edges": 0,
+                                "seed": i,
+                                "debug": debug
+                            }
+
+                            # Random instance
+                            start_time = time.time()
+                            instance = problem.generate_problem_instance(config)
+                            end_time = time.time()
+
+                            elapsed_time = end_time - start_time
+                            print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                            output_opt = alg_OPT_MEPT(instance)
+                            output_v1 = alg_E_SC_MEPT(instance)
+                            output_v2 = alg_E_T_MEPT(instance)
+                            print(
+                                f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                            result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                          output_opt["total_towers"],
+                                          output_v1["elapsed_time"], output_v1["eccentricity"],
+                                          output_v1["total_towers"],
+                                          output_v2["elapsed_time"], output_v2["eccentricity"],
+                                          output_v2["total_towers"],
+                                          ]
+                            output.loc[len(results)] = result_row
+                        output.to_csv(destination)
+    print(f"RGG with variable radius completed.")
+    return
+
+def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(
+        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
+                 "total_towers_e_t_mept"])
+
+    print(f"Regular Manhattan staterted...")
+    for area in areas:
+        for tower in towers:
+            for n in n_traj:
+                for size in traj_sizes:
+                    print(f"exp area {area}, towers {tower}, n traj {n}, traj size {size}.")
+                    # creazione path di salvataggio
+                    destination = get_exp_name(3, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
+                    for i in range(1, iterations):
+                        tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+
+                        print(f"Iteration {i}/{iterations}")
+                        config = {
+                            "area_side": area,
+                            "towers": tower,
+                            "radius_min": 0,
+                            "radius_max": 0,
+                            "trajectories": n,
+                            "min_dist_trajectory": size,
+                            "scenario": 3,
+                            "lattice_neighbors": 0,
+                            "star_edges": 0,
+                            "seed": i,
+                            "debug": debug
+                        }
+
+                        # Random instance
+                        start_time = time.time()
+                        instance = problem.generate_problem_instance(config)
+                        end_time = time.time()
+
+                        elapsed_time = end_time - start_time
+                        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                        output_opt = alg_OPT_MEPT(instance)
+                        output_v1 = alg_E_SC_MEPT(instance)
+                        output_v2 = alg_E_T_MEPT(instance)
+                        print(
+                            f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                        result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                      output_opt["total_towers"],
+                                      output_v1["elapsed_time"], output_v1["eccentricity"],
+                                      output_v1["total_towers"],
+                                      output_v2["elapsed_time"], output_v2["eccentricity"],
+                                      output_v2["total_towers"],
+                                      ]
+                        output.loc[len(results)] = result_row
+                    output.to_csv(destination)
+    print(f"Regular Manhattan completed.")
+    return
+
+def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(
+        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
+                 "total_towers_e_t_mept"])
+
+    print(f"Regular Diagonal staterted...")
+    for area in areas:
+        for tower in towers:
+            for n in n_traj:
+                for size in traj_sizes:
+                    print(f"exp area {area}, towers {tower}, n traj {n}, traj size {size}.")
+                    # creazione path di salvataggio
+                    destination = get_exp_name(4, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
+                    for i in range(1, iterations):
+                        tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, 0)
+
+                        print(f"Iteration {i}/{iterations}")
+                        config = {
+                            "area_side": area,
+                            "towers": tower,
+                            "radius_min": 0,
+                            "radius_max": 0,
+                            "trajectories": n,
+                            "min_dist_trajectory": size,
+                            "scenario": 4,
+                            "lattice_neighbors": 0,
+                            "star_edges": 0,
+                            "seed": i,
+                            "debug": debug
+                        }
+
+                        # Random instance
+                        start_time = time.time()
+                        instance = problem.generate_problem_instance(config)
+                        end_time = time.time()
+
+                        elapsed_time = end_time - start_time
+                        print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                        output_opt = alg_OPT_MEPT(instance)
+                        output_v1 = alg_E_SC_MEPT(instance)
+                        output_v2 = alg_E_T_MEPT(instance)
+                        print(
+                            f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                        result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                      output_opt["total_towers"],
+                                      output_v1["elapsed_time"], output_v1["eccentricity"],
+                                      output_v1["total_towers"],
+                                      output_v2["elapsed_time"], output_v2["eccentricity"],
+                                      output_v2["total_towers"],
+                                      ]
+                        output.loc[len(results)] = result_row
+                    output.to_csv(destination)
+    print(f"Regular Diagonal completed.")
+    return
+
+def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(
+        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
+                 "total_towers_e_t_mept"])
+
+    print(f"Lattice staterted...")
+    for area in areas:
+        for tower in towers:
+            for n in n_traj:
+                for size in traj_sizes:
+                    for l in lattices:
+                        print(f"exp area {area}, towers {tower}, neighbors {l}, n traj {n}, traj size {size}.")
+                        # creazione path di salvataggio
+                        destination = get_exp_name(6, min_rad, max_rad, tower, area, l, 0, n, size, dict_sc)
+                        for i in range(1, iterations):
+                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, l, 0)
+
+                            print(f"Iteration {i}/{iterations}")
+                            config = {
+                                "area_side": area,
+                                "towers": tower,
+                                "radius_min": 0,
+                                "radius_max": 0,
+                                "trajectories": n,
+                                "min_dist_trajectory": size,
+                                "scenario": 6,
+                                "lattice_neighbors": l,
+                                "star_edges": 0,
+                                "seed": i,
+                                "debug": debug
+                            }
+
+                            # Random instance
+                            start_time = time.time()
+                            instance = problem.generate_problem_instance(config)
+                            end_time = time.time()
+
+                            elapsed_time = end_time - start_time
+                            print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                            output_opt = alg_OPT_MEPT(instance)
+                            output_v1 = alg_E_SC_MEPT(instance)
+                            output_v2 = alg_E_T_MEPT(instance)
+                            print(
+                                f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                            result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                          output_opt["total_towers"],
+                                          output_v1["elapsed_time"], output_v1["eccentricity"],
+                                          output_v1["total_towers"],
+                                          output_v2["elapsed_time"], output_v2["eccentricity"],
+                                          output_v2["total_towers"],
+                                          ]
+                            output.loc[len(results)] = result_row
+                        output.to_csv(destination)
+    print(f"Lattice completed.")
+    return
+
+def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc):
+    output = pd.DataFrame(
+        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
+                 "total_towers_e_t_mept"])
+
+    print(f"Lattice staterted...")
+    for area in areas:
+        for tower in towers:
+            for n in n_traj:
+                for size in traj_sizes:
+                    for s in stars:
+                        print(f"exp area {area}, towers {tower}, stars {s}, n traj {n}, traj size {size}.")
+                        # creazione path di salvataggio
+                        destination = get_exp_name(7, min_rad, max_rad, tower, area, 0, s, n, size, dict_sc)
+                        for i in range(1, iterations):
+                            tower, lattice, star = problem.preprocessing_scenario(scenario, tower, 0, s)
+
+                            print(f"Iteration {i}/{iterations}")
+                            config = {
+                                "area_side": area,
+                                "towers": tower,
+                                "radius_min": 0,
+                                "radius_max": 0,
+                                "trajectories": n,
+                                "min_dist_trajectory": size,
+                                "scenario": 7,
+                                "lattice_neighbors": l,
+                                "star_edges": star,
+                                "seed": i,
+                                "debug": debug
+                            }
+
+                            # Random instance
+                            start_time = time.time()
+                            instance = problem.generate_problem_instance(config)
+                            end_time = time.time()
+
+                            elapsed_time = end_time - start_time
+                            print(f"generate_problem_instance execution time: {round(elapsed_time, 4)} s")
+                            output_opt = alg_OPT_MEPT(instance)
+                            output_v1 = alg_E_SC_MEPT(instance)
+                            output_v2 = alg_E_T_MEPT(instance)
+                            print(
+                                f"solution retrieving time OPT: {round(output_opt['elapsed_time'], 4)} s, MPT_SC: {round(output_v1['elapsed_time'], 4)}, MEPT_T: {round(output_v2['elapsed_time'], 4)}")
+                            result_row = [i, output_opt["elapsed_time"], output_opt["eccentricity"],
+                                          output_opt["total_towers"],
+                                          output_v1["elapsed_time"], output_v1["eccentricity"],
+                                          output_v1["total_towers"],
+                                          output_v2["elapsed_time"], output_v2["eccentricity"],
+                                          output_v2["total_towers"],
+                                          ]
+                            output.loc[len(results)] = result_row
+                        output.to_csv(destination)
+    print(f"Lattice completed.")
+    return
 def visualize_exp_paper():
     exp_folder = "exp"
 

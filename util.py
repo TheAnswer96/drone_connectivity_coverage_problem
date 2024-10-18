@@ -324,3 +324,29 @@ def plot_experiment_results(csv_path):
     # plt.show()
 
     print(f"Plot saved to {img_path}")
+
+def get_exp_name(scenario, min_rad, max_rad, towers, area, neighbors, star, n_traj, traject_size, dict_sc):
+    folder_exp = "exp"
+    subfolder_exp = dict_sc[scenario]
+
+    if scenario == 1:
+        file_name = f"result_a{area}_t{towers}_r{min_rad}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    if scenario == 2:
+        file_name = f"result_a{area}_t{towers}_rmin{min_rad}_rmax{max_rad}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    if scenario == 3:
+        file_name = f"result_a{area}_t{towers}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    if scenario == 4:
+        file_name = f"result_a{area}_t{towers}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    if scenario == 5:
+        raise "Exception: this scenario not considered."
+    if scenario == 6:
+        file_name = f"result_a{area}_t{towers}_neig{neighbors}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    if scenario == 7:
+        file_name = f"result_a{area}_t{towers}_star{star}_nt{n_traj}_ts{traject_size}.csv"
+        return os.path.join(folder_exp, subfolder_exp, file_name)
+    return
