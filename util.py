@@ -294,26 +294,32 @@ def plot_experiment_results(csv_path):
     x = data['iteration_seed']
 
     # Plot eccentricity
-    axes[0].plot(x, data['eccentricity_opt'], label='Opt', color='blue')
-    axes[0].plot(x, data['eccentricity_e_sc_mept'], label='SC MEPT', color='green')
-    axes[0].plot(x, data['eccentricity_e_t_mept'], label='T MEPT', color='red')
+    axes[0].plot(x, data['eccentricity_opt'], label='Opt', color='blue', marker='o')
+    axes[0].plot(x, data['eccentricity_e_sc_mept'], label='SC MEPT', color='green', marker='*')
+    axes[0].plot(x, data['eccentricity_e_t_mept'], label='T MEPT', color='red', marker='s')
     axes[0].set_ylabel('Eccentricity')
     axes[0].legend()
+    axes[0].set_xticks(x)
+    axes[0].grid(True)
 
     # Plot total towers
-    axes[1].plot(x, data['total_towers_opt'], label='Opt', color='blue')
-    axes[1].plot(x, data['total_towers_e_sc_mept'], label='SC MEPT', color='green')
-    axes[1].plot(x, data['total_towers_e_t_mept'], label='T MEPT', color='red')
+    axes[1].plot(x, data['total_towers_opt'], label='Opt', color='blue', marker='o')
+    axes[1].plot(x, data['total_towers_e_sc_mept'], label='SC MEPT', color='green', marker='*')
+    axes[1].plot(x, data['total_towers_e_t_mept'], label='T MEPT', color='red', marker='s')
     axes[1].set_ylabel('Total Towers')
     axes[1].legend()
+    axes[1].set_xticks(x)
+    axes[1].grid(True)
 
     # Plot time
-    axes[2].plot(x, data['time_opt'], label='Opt', color='blue')
-    axes[2].plot(x, data['time_e_sc_mept'], label='SC MEPT', color='green')
-    axes[2].plot(x, data['time_e_t_mept'], label='T MEPT', color='red')
-    axes[2].set_ylabel('Time')
+    axes[2].plot(x, data['time_opt'], label='Opt', color='blue', marker='o')
+    axes[2].plot(x, data['time_e_sc_mept'], label='SC MEPT', color='green', marker='*')
+    axes[2].plot(x, data['time_e_t_mept'], label='T MEPT', color='red', marker='s')
+    axes[2].set_ylabel('Time [s]')
     axes[2].set_xlabel('Iteration Seed')
     axes[2].legend()
+    axes[2].set_xticks(x)
+    axes[2].grid(True)
 
     plt.tight_layout()
 

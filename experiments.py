@@ -298,7 +298,8 @@ def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc
         for tower in towers:
             for n in n_traj:
                 for size in traj_sizes:
-                    tower, lattice, star = problem.preprocessing_scenario(3, tower, 0, 0)
+                    # tower, lattice, star = problem.preprocessing_scenario(3, tower, 0, 0)
+                    print("fare il controllo delle torri prima di far girare")
                     output = pd.DataFrame(
                         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
@@ -354,7 +355,8 @@ def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc,
         for tower in towers:
             for n in n_traj:
                 for size in traj_sizes:
-                    tower, lattice, star = problem.preprocessing_scenario(4, tower, 0, 0)
+                    # tower, lattice, star = problem.preprocessing_scenario(4, tower, 0, 0)
+                    print("fare il controllo delle torri prima di far girare")
                     output = pd.DataFrame(
                         columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
                                  "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
@@ -411,6 +413,9 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
             for n in n_traj:
                 for size in traj_sizes:
                     for lattice in lattices:
+                        print("fare il controllo delle torri prima di far girare")
+                        if lattice > tower / 2:
+                            continue
                         # tower, lattice, star = problem.preprocessing_scenario(6, tower, lattice, 0)
                         output = pd.DataFrame(
                             columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
@@ -471,6 +476,7 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debu
                 for size in traj_sizes:
                     for s in stars:
                         # tower, lattice, star = problem.preprocessing_scenario(7, tower, 0, s)
+                        print("fare il controllo delle torri prima di far girare")
                         output = pd.DataFrame(
                             columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
                                      "time_e_sc_mept",
@@ -539,6 +545,7 @@ def visualize_exp_paper():
             plot_experiment_results(current_file)
     return
 
+#the function below is a temporary function which was implemented to solve a temporary issue
 def fix_exp_results():
     print("ATTENTION: this method should be invoked only if the CSV of experiments are broken.\n")
     scenarios = [1, 2, 3, 4, 7]
