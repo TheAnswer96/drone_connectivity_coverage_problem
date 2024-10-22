@@ -537,3 +537,43 @@ def visualize_exp_paper():
             print(current_file)
             plot_experiment_results(current_file)
     return
+
+def fix_exp_results():
+    print("ATTENTION: this method should be invoked only if the CSV of experiments are broken.\n")
+    scenarios = [1, 2, 3, 4, 7]
+    # scenarios = [1]
+    for scenario in scenarios:
+        print("============================")
+        print(f"folder: {scenario}")
+        folder = os.path.join("exp", dir_dict[scenario])
+        dir_wrong = os.path.join(folder, "wrong")
+        wrong_files = os.listdir(dir_wrong)
+        names_rows = []
+        for file in wrong_files:
+            file_path = os.path.join(dir_wrong, file)
+            csv = pd.read_csv(file_path)
+            names_rows.append([file_path, csv.shape[0]])
+            # print(f"name: {file}-> #rows: {csv.shape[0]}")
+        print(f"unsorted: {names_rows}")
+        names_rows.sort(key=lambda x: x[1])
+        print(f"sorted: {names_rows}")
+        print("============================")
+
+        larger_item = names_rows[-1]
+        n_csv = int(larger_item[1] / 33)
+        larger_name = larger_item[0]
+        larger_csv = pd.read_csv(larger_name)
+        print(f"larger: {larger_item}, #CSV: {n_csv}/{len(names_rows)}")
+        for idx in range(n_csv):
+            original_wrong_name = names_rows[idx][0]
+            parts = original_wrong_name.split(os.sep)
+            parts.remove('wrong')
+            correct_file = os.path.join(*parts)
+            print(f"right folder: {correct_file}")
+            start = idx * 33
+            end = start + 33
+            correct_csv = larger_csv.iloc[start:end, :]
+            # print(correct_csv.head())
+            correct_csv = correct_csv.drop('Unnamed: 0', axis=1)
+            correct_csv.to_csv(correct_file, index=False)
+    return

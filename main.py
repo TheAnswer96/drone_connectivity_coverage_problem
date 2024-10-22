@@ -1,7 +1,7 @@
 import math
 import time
 import problem_gen as problem
-from experiments import run_experiments_paper, visualize_exp_paper
+from experiments import run_experiments_paper, visualize_exp_paper, fix_exp_results
 from util import is_square
 import argparse
 
@@ -166,4 +166,5 @@ if __name__ == '__main__':
     #     run_experiments_paper(scenario)
 
 
-    visualize_exp_paper()
+    # visualize_exp_paper()
+    fix_exp_results()
