@@ -411,7 +411,7 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
             for n in n_traj:
                 for size in traj_sizes:
                     for lattice in lattices:
-                        tower, lattice, star = problem.preprocessing_scenario(6, tower, lattice, 0)
+                        # tower, lattice, star = problem.preprocessing_scenario(6, tower, lattice, 0)
                         output = pd.DataFrame(
                             columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
                                      "time_e_sc_mept",
@@ -421,6 +421,7 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
                         print(f"exp area {area}, towers {tower}, neighbors {lattice}, n traj {n}, min traj size {size}.")
                         # creazione path di salvataggio
                         destination = get_exp_name(6, 0, 0, tower, area, lattice, 0, n, size, dict_sc)
+                        print(f"dir: {destination}")
                         for i in range(1, iterations+1):
                             print(f"Iteration {i}/{iterations}")
                             config = {
@@ -469,7 +470,7 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debu
             for n in n_traj:
                 for size in traj_sizes:
                     for s in stars:
-                        tower, lattice, star = problem.preprocessing_scenario(7, tower, 0, s)
+                        # tower, lattice, star = problem.preprocessing_scenario(7, tower, 0, s)
                         output = pd.DataFrame(
                             columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
                                      "time_e_sc_mept",
