@@ -319,7 +319,7 @@ def plot_experiment_results(csv_path):
 
     img_path = os.path.join(img_folder, f'{base_filename}.png')
     plt.savefig(img_path)
-
+    plt.close()
 
     # plt.show()
 

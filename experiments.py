@@ -170,8 +170,6 @@ def run_experiments_paper(scene):
 
 
 def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept", "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept", "total_towers_e_t_mept"])
-
     print(f"RGG with fixed radius started...")
     for area in areas:
         for tower in towers:
@@ -182,6 +180,11 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, 
                             continue
 
                         print(f"exp area {area}, towers {tower}, rad {rad}, n traj {n}, min traj size {size}.")
+                        output = pd.DataFrame(
+                            columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
+                                     "time_e_sc_mept", "eccentricity_e_sc_mept", "total_towers_e_sc_mept",
+                                     "time_e_t_mept", "eccentricity_e_t_mept", "total_towers_e_t_mept"])
+
                         # creazione path di salvataggio
                         destination = get_exp_name(1, rad, 0, tower, area, 0, 0, n, size, dict_sc)
                         for i in range(1, iterations+1):
@@ -228,11 +231,6 @@ def run_RGG_fixed(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, 
 
 
 def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(
-        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
-                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                 "total_towers_e_t_mept"])
-
     print(f"RGG with variable radius stated...")
     for area in areas:
         for tower in towers:
@@ -243,6 +241,12 @@ def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_s
                             continue
 
                         print(f"exp area {area}, towers {tower}, rad ({min_rad},{max_rad}), n traj {n}, min traj size {size}.")
+                        output = pd.DataFrame(
+                            columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
+                                     "time_e_sc_mept",
+                                     "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
+                                     "eccentricity_e_t_mept",
+                                     "total_towers_e_t_mept"])
                         # creazione path di salvataggio
                         destination = get_exp_name(2, min_rad, max_rad, tower, area, 0, 0, n, size, dict_sc)
                         for i in range(1, iterations+1):
@@ -289,18 +293,17 @@ def run_RGG_variable(areas, towers, rads, n_traj, traj_sizes, iterations, dict_s
 
 
 def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(
-        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
-                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                 "total_towers_e_t_mept"])
-
     print(f"Regular Manhattan started...")
     for area in areas:
         for tower in towers:
             for n in n_traj:
                 for size in traj_sizes:
                     tower, lattice, star = problem.preprocessing_scenario(3, tower, 0, 0)
-
+                    output = pd.DataFrame(
+                        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
+                                 "eccentricity_e_t_mept",
+                                 "total_towers_e_t_mept"])
                     print(f"exp area {area}, towers {tower}, n traj {n}, min traj size {size}.")
                     # creazione path di salvataggio
                     destination = get_exp_name(3, 0, 0, tower, area, 0, 0, n, size, dict_sc)
@@ -346,18 +349,17 @@ def run_regular_manhattan(areas, towers, n_traj, traj_sizes, iterations, dict_sc
 
 
 def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(
-        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
-                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                 "total_towers_e_t_mept"])
-
     print(f"Regular Diagonal started...")
     for area in areas:
         for tower in towers:
             for n in n_traj:
                 for size in traj_sizes:
                     tower, lattice, star = problem.preprocessing_scenario(4, tower, 0, 0)
-
+                    output = pd.DataFrame(
+                        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
+                                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
+                                 "eccentricity_e_t_mept",
+                                 "total_towers_e_t_mept"])
                     print(f"exp area {area}, towers {tower}, n traj {n}, min traj size {size}.")
                     # creazione path di salvataggio
                     destination = get_exp_name(4, 0, 0, tower, area, 0, 0, n, size, dict_sc)
@@ -403,11 +405,6 @@ def run_regular_diagonal(areas, towers, n_traj, traj_sizes, iterations, dict_sc,
 
 
 def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(
-        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
-                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                 "total_towers_e_t_mept"])
-
     print(f"Lattice started...")
     for area in areas:
         for tower in towers:
@@ -415,7 +412,12 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
                 for size in traj_sizes:
                     for lattice in lattices:
                         tower, lattice, star = problem.preprocessing_scenario(6, tower, lattice, 0)
-
+                        output = pd.DataFrame(
+                            columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
+                                     "time_e_sc_mept",
+                                     "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
+                                     "eccentricity_e_t_mept",
+                                     "total_towers_e_t_mept"])
                         print(f"exp area {area}, towers {tower}, neighbors {lattice}, n traj {n}, min traj size {size}.")
                         # creazione path di salvataggio
                         destination = get_exp_name(6, 0, 0, tower, area, lattice, 0, n, size, dict_sc)
@@ -461,11 +463,6 @@ def run_lattice(areas, towers, lattices, n_traj, traj_sizes, iterations, dict_sc
 
 
 def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debug):
-    output = pd.DataFrame(
-        columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt", "time_e_sc_mept",
-                 "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept", "eccentricity_e_t_mept",
-                 "total_towers_e_t_mept"])
-
     print(f"Lattice started...")
     for area in areas:
         for tower in towers:
@@ -473,7 +470,12 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debu
                 for size in traj_sizes:
                     for s in stars:
                         tower, lattice, star = problem.preprocessing_scenario(7, tower, 0, s)
-
+                        output = pd.DataFrame(
+                            columns=["iteration_seed", "time_opt", "eccentricity_opt", "total_towers_opt",
+                                     "time_e_sc_mept",
+                                     "eccentricity_e_sc_mept", "total_towers_e_sc_mept", "time_e_t_mept",
+                                     "eccentricity_e_t_mept",
+                                     "total_towers_e_t_mept"])
                         print(f"exp area {area}, towers {tower}, stars {s}, n traj {n}, min traj size {size}.")
                         # creazione path di salvataggio
                         destination = get_exp_name(7, 0, 0, tower, area, 0, s, n, size, dict_sc)
@@ -523,11 +525,15 @@ def visualize_exp_paper():
 
     scenarios_folder = os.listdir(exp_folder)
 
+        
     for dir in scenarios_folder:
         current_path = os.path.join(exp_folder, dir)
+        if not os.path.exists(os.path.join(current_path, 'img')):
+            os.makedirs(os.path.join(current_path, 'img'))
         files = os.listdir(current_path)
         files.remove('img')
         for file in files:
             current_file = os.path.join(current_path, file)
+            print(current_file)
             plot_experiment_results(current_file)
     return

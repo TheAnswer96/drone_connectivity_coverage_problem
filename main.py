@@ -161,9 +161,9 @@ if __name__ == '__main__':
 
     #Run this function for exhaustive tests
 
-    scenarios = [1, 2, 3, 4, 6, 7]
-    for scenario in scenarios:
-        run_experiments_paper(scenario)
+    # scenarios = [1, 2, 3, 4, 6, 7]
+    # for scenario in scenarios:
+    #     run_experiments_paper(scenario)
 
 
-    # visualize_exp_paper()
+    visualize_exp_paper()
