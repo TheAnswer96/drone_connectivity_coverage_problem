@@ -331,6 +331,55 @@ def plot_experiment_results(csv_path):
 
     print(f"Plot saved to {img_path}")
 
+def plot_aggregate(dst, x, towers, times, conf_towers, conf_times):
+    opt_towers, sc_towers, t_towers = towers
+    opt_times, sc_times, t_times = times
+
+    opt_conf_tower, sc_conf_tower, t_conf_tower = conf_towers
+    opt_conf_time, sc_conf_time, t_conf_time = conf_times
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 15))
+
+    axes[0].set_title('Total Time')
+    axes[1].set_title('Total Towers')
+
+    opt_yerr_tower = compute_confidence(opt_conf_tower)
+    sc_yerr_tower = compute_confidence(sc_conf_tower)
+    t_yerr_tower = compute_confidence(t_conf_tower)
+
+    opt_yerr_time = compute_confidence(opt_conf_time)
+    sc_yerr_time = compute_confidence(sc_conf_time)
+    t_yerr_time = compute_confidence(t_conf_time)
+
+    # Plot towers with asymmetric error bars
+    axes[0].errorbar(x, opt_towers, yerr=opt_yerr_tower, label='Opt', color='blue', marker='o', capsize=5)
+    axes[0].errorbar(x, sc_towers, yerr=sc_yerr_tower, label='SC MEPT', color='green', marker='*', capsize=5)
+    axes[0].errorbar(x, t_towers, yerr=t_yerr_tower, label='T MEPT', color='red', marker='s', capsize=5)
+    axes[0].set_ylabel('Towers')
+    axes[0].legend()
+    axes[0].set_xticks(x)
+    axes[0].grid(True)
+
+    # Plot time with asymmetric error bars
+    axes[1].errorbar(x, opt_times, yerr=opt_yerr_time, label='Opt', color='blue', marker='o', capsize=5)
+    axes[1].errorbar(x, sc_times, yerr=sc_yerr_time, label='SC MEPT', color='green', marker='*', capsize=5)
+    axes[1].errorbar(x, t_times, yerr=t_yerr_time, label='T MEPT', color='red', marker='s', capsize=5)
+    axes[1].set_ylabel('Time [s]')
+    axes[1].set_xlabel('# Trajectories')
+    axes[1].legend()
+    axes[1].set_xticks(x)
+    axes[1].grid(True)
+
+
+    plt.tight_layout()
+
+    plt.savefig(dst)
+    plt.close()
+
+
+    print(f"Plot saved to {dst}")
+    return
+
 def get_exp_name(scenario, min_rad, max_rad, towers, area, neighbors, star, n_traj, traject_size, dict_sc):
     folder_exp = "exp"
     subfolder_exp = dict_sc[scenario]
@@ -356,3 +405,61 @@ def get_exp_name(scenario, min_rad, max_rad, towers, area, neighbors, star, n_tr
         file_name = f"result_a{area}_t{towers}_star{star}_nt{n_traj}_ts{traject_size}.csv"
         return os.path.join(folder_exp, subfolder_exp, file_name)
     return
+
+def compute_confidence(conf):
+    lower = [y[0] for y in conf]
+    upper = [y[1] for y in conf]
+    return [lower, upper]
+
+def get_confidence(lst):
+    return st.t.interval(alpha=0.95, df=len(lst), loc=np.mean(lst), scale=st.sem(lst))
+def plot_bars_with_confidence(data, dst):
+    # Convert x to a numpy array for easier manipulation
+    x = np.array(x)
+
+    # Define the width of the bars
+    bar_width = 0.35
+
+    # Set positions for bars (offset them to avoid overlap)
+    x_1 = x - bar_width / 2  # Towers will be on the left
+    x_2 = x + bar_width / 2  # Times will be on the right
+
+    # Create the figure and two subplots
+    fig, axes = plt.subplots(2, 1, figsize=(12, 10))
+
+    ### Subplot 1 - Scenario 1
+    axes[0].bar(x_1, towers_scenario1, width=bar_width, yerr=conf_towers_scenario1,
+                label='Diagonal Towers', color='blue', capsize=5)
+    axes[0].bar(x_times, times_scenario1, width=bar_width, yerr=conf_times_scenario1,
+                label=f'Manhattan Towers', color='orange', capsize=5)
+
+    # Set labels and title for the first subplot
+    axes[0].set_title(f'Number of Towers')
+    axes[0].set_xlabel('#Trajectories')
+    axes[0].set_ylabel('Towers')
+    axes[0].set_xticks(x)
+    axes[0].legend()
+    axes[0].grid(True, axis='y', linestyle='--', alpha=0.7)
+
+    ### Subplot 2 - Scenario 2
+    axes[1].bar(x_1, towers_scenario2, width=bar_width, yerr=conf_towers_scenario2,
+                label=f'{alg_name} Towers', color='blue', capsize=5)
+    axes[1].bar(x_times, times_scenario2, width=bar_width, yerr=conf_times_scenario2,
+                label=f'{alg_name} Times', color='orange', capsize=5)
+
+    # Set labels and title for the second subplot
+    axes[1].set_title(f'{alg_name} - Scenario 2')
+    axes[1].set_xlabel('# Trajectories')
+    axes[1].set_ylabel('Values')
+    axes[1].set_xticks(x)
+    axes[1].legend()
+    axes[1].grid(True, axis='y', linestyle='--', alpha=0.7)
+
+    # Adjust layout for better spacing
+    plt.tight_layout()
+
+    # Save the figure
+    plt.savefig(dst)
+    plt.close()
+
+    print(f"Bar plot with confidence saved to {dst}")
