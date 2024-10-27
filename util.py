@@ -4,6 +4,8 @@ import networkx as nx
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import scipy.stats as st
+import numpy as np
 # from algorithms import *
 
 EPSILON = 1e-5  # Small epsilon to handle floating-point precision issues
@@ -332,24 +334,37 @@ def plot_experiment_results(csv_path):
     print(f"Plot saved to {img_path}")
 
 def plot_aggregate(dst, x, towers, times, conf_towers, conf_times):
+    # Helper function to ensure all confidence interval values are non-negative
+    def compute_confidence(conf_intervals):
+        return [(max(0, low), max(0, high)) for low, high in conf_intervals]
+
+    # Unpack data for plotting
     opt_towers, sc_towers, t_towers = towers
     opt_times, sc_times, t_times = times
 
-    opt_conf_tower, sc_conf_tower, t_conf_tower = conf_towers
-    opt_conf_time, sc_conf_time, t_conf_time = conf_times
+    # Process confidence intervals, making sure no negative values remain
+    opt_conf_tower = compute_confidence(conf_towers[0])
+    sc_conf_tower = compute_confidence(conf_towers[1])
+    t_conf_tower = compute_confidence(conf_towers[2])
 
+    opt_conf_time = compute_confidence(conf_times[0])
+    sc_conf_time = compute_confidence(conf_times[1])
+    t_conf_time = compute_confidence(conf_times[2])
+
+    # Prepare figure with subplots for Time and Towers
     fig, axes = plt.subplots(2, 1, figsize=(10, 15))
 
     axes[0].set_title('Total Time')
     axes[1].set_title('Total Towers')
 
-    opt_yerr_tower = compute_confidence(opt_conf_tower)
-    sc_yerr_tower = compute_confidence(sc_conf_tower)
-    t_yerr_tower = compute_confidence(t_conf_tower)
+    # Convert confidence intervals to correct format for yerr in errorbar
+    opt_yerr_tower = np.array(opt_conf_tower).T
+    sc_yerr_tower = np.array(sc_conf_tower).T
+    t_yerr_tower = np.array(t_conf_tower).T
 
-    opt_yerr_time = compute_confidence(opt_conf_time)
-    sc_yerr_time = compute_confidence(sc_conf_time)
-    t_yerr_time = compute_confidence(t_conf_time)
+    opt_yerr_time = np.array(opt_conf_time).T
+    sc_yerr_time = np.array(sc_conf_time).T
+    t_yerr_time = np.array(t_conf_time).T
 
     # Plot towers with asymmetric error bars
     axes[0].errorbar(x, opt_towers, yerr=opt_yerr_tower, label='Opt', color='blue', marker='o', capsize=5)
@@ -370,12 +385,9 @@ def plot_aggregate(dst, x, towers, times, conf_towers, conf_times):
     axes[1].set_xticks(x)
     axes[1].grid(True)
 
-
     plt.tight_layout()
-
     plt.savefig(dst)
     plt.close()
-
 
     print(f"Plot saved to {dst}")
     return
@@ -413,53 +425,136 @@ def compute_confidence(conf):
 
 def get_confidence(lst):
     return st.t.interval(alpha=0.95, df=len(lst), loc=np.mean(lst), scale=st.sem(lst))
-def plot_bars_with_confidence(data, dst):
-    # Convert x to a numpy array for easier manipulation
-    x = np.array(x)
 
-    # Define the width of the bars
-    bar_width = 0.35
 
-    # Set positions for bars (offset them to avoid overlap)
-    x_1 = x - bar_width / 2  # Towers will be on the left
-    x_2 = x + bar_width / 2  # Times will be on the right
+def plot_algorithm_diagonal_manhattan(data, plot_name):
+    # Extract unique trajectory values for the x-axis
+    x = data["trajectories"].unique()
 
-    # Create the figure and two subplots
+    # Prepare figure with 2 subplots (one for Towers, one for Time)
     fig, axes = plt.subplots(2, 1, figsize=(12, 10))
 
-    ### Subplot 1 - Scenario 1
-    axes[0].bar(x_1, towers_scenario1, width=bar_width, yerr=conf_towers_scenario1,
-                label='Diagonal Towers', color='blue', capsize=5)
-    axes[0].bar(x_times, times_scenario1, width=bar_width, yerr=conf_times_scenario1,
-                label=f'Manhattan Towers', color='orange', capsize=5)
+    # Define colors and markers for each algorithm
+    algorithms = ["Opt", "SC MEPT", "T MEPT"]
+    colors = ["blue", "green", "red"]
+    markers = ["o", "s", "^"]
 
-    # Set labels and title for the first subplot
-    axes[0].set_title(f'Number of Towers')
-    axes[0].set_xlabel('#Trajectories')
-    axes[0].set_ylabel('Towers')
-    axes[0].set_xticks(x)
+    # Extract data for Diagonal scenario (Towers and Times for each algorithm)
+    diagonal_towers_opt = data["diagonal_towers_opt"]
+    diagonal_towers_sc = data["diagonal_towers_sc"]
+    diagonal_towers_t = data["diagonal_towers_t"]
+
+    diagonal_times_opt = data["diagonal_time_opt"]
+    diagonal_times_sc = data["diagonal_time_sc"]
+    diagonal_times_t = data["diagonal_time_t"]
+
+    # Extract data for Manhattan scenario (Towers and Times for each algorithm)
+    manhattan_towers_opt = data["manhattan_towers_opt"]
+    manhattan_towers_sc = data["manhattan_towers_sc"]
+    manhattan_towers_t = data["manhattan_towers_t"]
+
+    manhattan_times_opt = data["manhattan_time_opt"]
+    manhattan_times_sc = data["manhattan_time_sc"]
+    manhattan_times_t = data["manhattan_time_t"]
+
+    # Extract confidence intervals for Diagonal scenario
+    diagonal_towers_opt_conf = data["diagonal_towers_opt_conf"]
+    diagonal_towers_sc_conf = data["diagonal_towers_sc_conf"]
+    diagonal_towers_t_conf = data["diagonal_towers_t_conf"]
+
+    diagonal_times_opt_conf = data["diagonal_time_opt_conf"]
+    diagonal_times_sc_conf = data["diagonal_time_sc_conf"]
+    diagonal_times_t_conf = data["diagonal_time_t_conf"]
+
+    # Extract confidence intervals for Manhattan scenario
+    manhattan_towers_opt_conf = data["manhattan_towers_opt_conf"]
+    manhattan_towers_sc_conf = data["manhattan_towers_sc_conf"]
+    manhattan_towers_t_conf = data["manhattan_towers_t_conf"]
+
+    manhattan_times_opt_conf = data["manhattan_time_opt_conf"]
+    manhattan_times_sc_conf = data["manhattan_time_sc_conf"]
+    manhattan_times_t_conf = data["manhattan_time_t_conf"]
+
+    ### Subplot 1 - Number of Towers
+    # Plot for "Opt" algorithm in both scenarios
+    opt_towers_yerr_diagonal = (diagonal_towers_opt_conf.apply(lambda conf: conf[0]),
+                                diagonal_towers_opt_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, diagonal_towers_opt, yerr=opt_towers_yerr_diagonal, label="Diagonal Opt",
+                     color="blue", marker="o", capsize=5)
+    opt_towers_yerr_manhattan = (manhattan_towers_opt_conf.apply(lambda conf: conf[0]),
+                                 manhattan_towers_opt_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, manhattan_towers_opt, yerr=opt_towers_yerr_manhattan, label="Manhattan Opt",
+                     color="blue", marker="o", linestyle="--", capsize=5)
+
+    # Plot for "SC MEPT" algorithm in both scenarios
+    sc_towers_yerr_diagonal = (diagonal_towers_sc_conf.apply(lambda conf: conf[0]),
+                               diagonal_towers_sc_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, diagonal_towers_sc, yerr=sc_towers_yerr_diagonal, label="Diagonal SC MEPT",
+                     color="green", marker="s", capsize=5)
+    sc_towers_yerr_manhattan = (manhattan_towers_sc_conf.apply(lambda conf: conf[0]),
+                                manhattan_towers_sc_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, manhattan_towers_sc, yerr=sc_towers_yerr_manhattan, label="Manhattan SC MEPT",
+                     color="green", marker="s", linestyle="--", capsize=5)
+
+    # Plot for "T MEPT" algorithm in both scenarios
+    t_towers_yerr_diagonal = (diagonal_towers_t_conf.apply(lambda conf: conf[0]),
+                              diagonal_towers_t_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, diagonal_towers_t, yerr=t_towers_yerr_diagonal, label="Diagonal T MEPT",
+                     color="red", marker="^", capsize=5)
+    t_towers_yerr_manhattan = (manhattan_towers_t_conf.apply(lambda conf: conf[0]),
+                               manhattan_towers_t_conf.apply(lambda conf: conf[1]))
+    axes[0].errorbar(x, manhattan_towers_t, yerr=t_towers_yerr_manhattan, label="Manhattan T MEPT",
+                     color="red", marker="^", linestyle="--", capsize=5)
+
+    # Set labels, title, and x-ticks for the first subplot
+    axes[0].set_title('Number of Towers for Each Algorithm')
+    axes[0].set_xlabel('# Trajectories')
+    axes[0].set_ylabel('Total Towers')
+    axes[0].set_xticks(x)  # Set x-axis ticks to match trajectory numbers
     axes[0].legend()
-    axes[0].grid(True, axis='y', linestyle='--', alpha=0.7)
+    axes[0].grid(True, linestyle='--', alpha=0.7)
 
-    ### Subplot 2 - Scenario 2
-    axes[1].bar(x_1, towers_scenario2, width=bar_width, yerr=conf_towers_scenario2,
-                label=f'{alg_name} Towers', color='blue', capsize=5)
-    axes[1].bar(x_times, times_scenario2, width=bar_width, yerr=conf_times_scenario2,
-                label=f'{alg_name} Times', color='orange', capsize=5)
+    ### Subplot 2 - Time
+    # Plot for "Opt" algorithm in both scenarios
+    opt_times_yerr_diagonal = (diagonal_times_opt_conf.apply(lambda conf: conf[0]),
+                               diagonal_times_opt_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, diagonal_times_opt, yerr=opt_times_yerr_diagonal, label="Diagonal Opt",
+                     color="blue", marker="o", capsize=5)
+    opt_times_yerr_manhattan = (manhattan_times_opt_conf.apply(lambda conf: conf[0]),
+                                manhattan_times_opt_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, manhattan_times_opt, yerr=opt_times_yerr_manhattan, label="Manhattan Opt",
+                     color="blue", marker="o", linestyle="--", capsize=5)
 
-    # Set labels and title for the second subplot
-    axes[1].set_title(f'{alg_name} - Scenario 2')
+    # Plot for "SC MEPT" algorithm in both scenarios
+    sc_times_yerr_diagonal = (diagonal_times_sc_conf.apply(lambda conf: conf[0]),
+                              diagonal_times_sc_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, diagonal_times_sc, yerr=sc_times_yerr_diagonal, label="Diagonal SC MEPT",
+                     color="green", marker="s", capsize=5)
+    sc_times_yerr_manhattan = (manhattan_times_sc_conf.apply(lambda conf: conf[0]),
+                               manhattan_times_sc_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, manhattan_times_sc, yerr=sc_times_yerr_manhattan, label="Manhattan SC MEPT",
+                     color="green", marker="s", linestyle="--", capsize=5)
+
+    # Plot for "T MEPT" algorithm in both scenarios
+    t_times_yerr_diagonal = (diagonal_times_t_conf.apply(lambda conf: conf[0]),
+                             diagonal_times_t_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, diagonal_times_t, yerr=t_times_yerr_diagonal, label="Diagonal T MEPT",
+                     color="red", marker="^", capsize=5)
+    t_times_yerr_manhattan = (manhattan_times_t_conf.apply(lambda conf: conf[0]),
+                              manhattan_times_t_conf.apply(lambda conf: conf[1]))
+    axes[1].errorbar(x, manhattan_times_t, yerr=t_times_yerr_manhattan, label="Manhattan T MEPT",
+                     color="red", marker="^", linestyle="--", capsize=5)
+
+    # Set labels, title, and x-ticks for the second subplot
+    axes[1].set_title('Time for Each Algorithm')
     axes[1].set_xlabel('# Trajectories')
-    axes[1].set_ylabel('Values')
-    axes[1].set_xticks(x)
+    axes[1].set_ylabel('Time [s]')
+    axes[1].set_xticks(x)  # Set x-axis ticks to match trajectory numbers
     axes[1].legend()
-    axes[1].grid(True, axis='y', linestyle='--', alpha=0.7)
+    axes[1].grid(True, linestyle='--', alpha=0.7)
 
-    # Adjust layout for better spacing
+    # Adjust layout and save
     plt.tight_layout()
-
-    # Save the figure
-    plt.savefig(dst)
+    plt.savefig(plot_name)
     plt.close()
-
-    print(f"Bar plot with confidence saved to {dst}")
+    print(f"Plot saved to {plot_name}")

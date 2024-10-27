@@ -604,336 +604,452 @@ def visualize_exp_aggregate():
     radius = [100, 150, 200, 250, 300]
 
     #Aggregation with respect to towers number
-    for rad in radius:
-        for tower in towers:
-            lst_times_opt = []
-            lst_times_sc = []
-            lst_times_t = []
-
-            lst_towers_opt = []
-            lst_towers_sc = []
-            lst_towers_t = []
-
-            lst_time_confidences_opt = []
-            lst_time_confidences_sc = []
-            lst_time_confidences_t = []
-
-            lst_tower_confidences_opt = []
-            lst_tower_confidences_sc = []
-            lst_tower_confidences_t = []
-            res_name = os.path.join(folder_rgg_fixed_towers, f"aggTowers_rad{rad}_nt{tower}.png")
-            for trj in trajectories:
-                if (tower < 100 and rad < 200) or (tower < 150 and rad < 150):
-                    lst_times_opt.append(0)
-                    lst_times_sc.append(0)
-                    lst_times_t.append(0)
-
-                    lst_time_confidences_opt.append((0, 0))
-                    lst_time_confidences_sc.append((0, 0))
-                    lst_time_confidences_t.append((0, 0))
-
-                    lst_towers_opt.append(0)
-                    lst_towers_sc.append(0)
-                    lst_towers_t.append(0)
-
-                    lst_tower_confidences_opt.append((0, 0))
-                    lst_tower_confidences_sc.append((0, 0))
-                    lst_tower_confidences_t.append((0, 0))
-                    continue
-
-                csv_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
-                csv = pd.read_csv(os.path.join("exp", "rgg_fixed", csv_name))
-
-                lst_times_opt.append(csv["time_opt"].mean())
-                lst_times_sc.append(csv["time_e_sc_mept"].mean())
-                lst_times_t.append(csv["time_e_t_mept"].mean())
-
-                lst_time_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]), scale=st.sem(csv["time_opt"])))
-                lst_time_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]), scale=st.sem(csv["time_e_sc_mept"])))
-                lst_time_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]), scale=st.sem(csv["time_e_t_mept"])))
-
-                lst_towers_opt.append(csv["total_towers_opt"].mean())
-                lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
-                lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
-
-                lst_tower_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_tower_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_tower_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-            plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t], [lst_times_opt, lst_times_sc, lst_times_t], [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t], [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
-
-        # Aggregation with respect to towers number
-
-    for tower in towers:
-        for rad in radius:
-            lst_times_opt = []
-            lst_times_sc = []
-            lst_times_t = []
-
-            lst_towers_opt = []
-            lst_towers_sc = []
-            lst_towers_t = []
-
-            lst_time_confidences_opt = []
-            lst_time_confidences_sc = []
-            lst_time_confidences_t = []
-
-            lst_tower_confidences_opt = []
-            lst_tower_confidences_sc = []
-            lst_tower_confidences_t = []
-            res_name = os.path.join(folder_rgg_fixed_radius, f"aggRad_rad{rad}_nt{tower}.png")
-            for trj in trajectories:
-                if (tower < 100 and rad < 200) or (tower < 150 and rad < 150):
-                    lst_times_opt.append(0)
-                    lst_times_sc.append(0)
-                    lst_times_t.append(0)
-
-                    lst_time_confidences_opt.append((0, 0))
-                    lst_time_confidences_sc.append((0, 0))
-                    lst_time_confidences_t.append((0, 0))
-
-                    lst_towers_opt.append(0)
-                    lst_towers_sc.append(0)
-                    lst_towers_t.append(0)
-
-                    lst_tower_confidences_opt.append((0, 0))
-                    lst_tower_confidences_sc.append((0, 0))
-                    lst_tower_confidences_t.append((0, 0))
-                    continue
-
-                csv_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
-                csv = pd.read_csv(os.path.join("exp", "rgg_fixed", csv_name))
-
-                lst_times_opt.append(csv["time_opt"].mean())
-                lst_times_sc.append(csv["time_e_sc_mept"].mean())
-                lst_times_t.append(csv["time_e_t_mept"].mean())
-
-                lst_time_confidences_opt.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_time_confidences_sc.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_time_confidences_t.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-                lst_towers_opt.append(csv["total_towers_opt"].mean())
-                lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
-                lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
-
-                lst_tower_confidences_opt.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_tower_confidences_sc.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_tower_confidences_t.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-            plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t],
-                           [lst_times_opt, lst_times_sc, lst_times_t],
-                           [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t],
-                           [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
+    # for rad in radius:
+    #     for tower in towers:
+    #         lst_times_opt = []
+    #         lst_times_sc = []
+    #         lst_times_t = []
+    #
+    #         lst_towers_opt = []
+    #         lst_towers_sc = []
+    #         lst_towers_t = []
+    #
+    #         lst_time_confidences_opt = []
+    #         lst_time_confidences_sc = []
+    #         lst_time_confidences_t = []
+    #
+    #         lst_tower_confidences_opt = []
+    #         lst_tower_confidences_sc = []
+    #         lst_tower_confidences_t = []
+    #         res_name = os.path.join(folder_rgg_fixed_towers, f"aggTowers_rad{rad}_nt{tower}.png")
+    #         for trj in trajectories:
+    #             if (tower < 100 and rad < 200) or (tower < 150 and rad < 150):
+    #                 lst_times_opt.append(0)
+    #                 lst_times_sc.append(0)
+    #                 lst_times_t.append(0)
+    #
+    #                 lst_time_confidences_opt.append((0, 0))
+    #                 lst_time_confidences_sc.append((0, 0))
+    #                 lst_time_confidences_t.append((0, 0))
+    #
+    #                 lst_towers_opt.append(0)
+    #                 lst_towers_sc.append(0)
+    #                 lst_towers_t.append(0)
+    #
+    #                 lst_tower_confidences_opt.append((0, 0))
+    #                 lst_tower_confidences_sc.append((0, 0))
+    #                 lst_tower_confidences_t.append((0, 0))
+    #                 continue
+    #
+    #             csv_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "rgg_fixed", csv_name))
+    #
+    #             lst_times_opt.append(csv["time_opt"].mean())
+    #             lst_times_sc.append(csv["time_e_sc_mept"].mean())
+    #             lst_times_t.append(csv["time_e_t_mept"].mean())
+    #
+    #             lst_time_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]), scale=st.sem(csv["time_opt"])))
+    #             lst_time_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]), scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_time_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]), scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #             lst_towers_opt.append(csv["total_towers_opt"].mean())
+    #             lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
+    #             lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
+    #
+    #             lst_tower_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_tower_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_tower_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #         plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t], [lst_times_opt, lst_times_sc, lst_times_t], [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t], [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
+    #
+    #     # Aggregation with respect to towers number
+    #
+    # for tower in towers:
+    #     for rad in radius:
+    #         lst_times_opt = []
+    #         lst_times_sc = []
+    #         lst_times_t = []
+    #
+    #         lst_towers_opt = []
+    #         lst_towers_sc = []
+    #         lst_towers_t = []
+    #
+    #         lst_time_confidences_opt = []
+    #         lst_time_confidences_sc = []
+    #         lst_time_confidences_t = []
+    #
+    #         lst_tower_confidences_opt = []
+    #         lst_tower_confidences_sc = []
+    #         lst_tower_confidences_t = []
+    #         res_name = os.path.join(folder_rgg_fixed_radius, f"aggRad_rad{rad}_nt{tower}.png")
+    #         for trj in trajectories:
+    #             if (tower < 100 and rad < 200) or (tower < 150 and rad < 150):
+    #                 lst_times_opt.append(0)
+    #                 lst_times_sc.append(0)
+    #                 lst_times_t.append(0)
+    #
+    #                 lst_time_confidences_opt.append((0, 0))
+    #                 lst_time_confidences_sc.append((0, 0))
+    #                 lst_time_confidences_t.append((0, 0))
+    #
+    #                 lst_towers_opt.append(0)
+    #                 lst_towers_sc.append(0)
+    #                 lst_towers_t.append(0)
+    #
+    #                 lst_tower_confidences_opt.append((0, 0))
+    #                 lst_tower_confidences_sc.append((0, 0))
+    #                 lst_tower_confidences_t.append((0, 0))
+    #                 continue
+    #
+    #             csv_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "rgg_fixed", csv_name))
+    #
+    #             lst_times_opt.append(csv["time_opt"].mean())
+    #             lst_times_sc.append(csv["time_e_sc_mept"].mean())
+    #             lst_times_t.append(csv["time_e_t_mept"].mean())
+    #
+    #             lst_time_confidences_opt.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_time_confidences_sc.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_time_confidences_t.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #             lst_towers_opt.append(csv["total_towers_opt"].mean())
+    #             lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
+    #             lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
+    #
+    #             lst_tower_confidences_opt.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_tower_confidences_sc.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_tower_confidences_t.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #         plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t],
+    #                        [lst_times_opt, lst_times_sc, lst_times_t],
+    #                        [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t],
+    #                        [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
 
     # ====================================================================================
     # =================== Aggregate RGG variable =========================================
-    folder_rgg_variable = os.path.join("exp", "rgg_variable", "aggregated")
-    folder_rgg_varible_towers = os.path.join(folder_rgg_variable, "towers")
-    folder_rgg_variable_radius = os.path.join(folder_rgg_variable, "radius")
-    if not os.path.exists(folder_rgg_variable):
-        os.makedirs(folder_rgg_variable)
-        os.makedirs(folder_rgg_varible_towers)
-        os.makedirs(folder_rgg_variable_radius)
+    # folder_rgg_variable = os.path.join("exp", "rgg_variable", "aggregated")
+    # folder_rgg_varible_towers = os.path.join(folder_rgg_variable, "towers")
+    # folder_rgg_variable_radius = os.path.join(folder_rgg_variable, "radius")
+    # if not os.path.exists(folder_rgg_variable):
+    #     os.makedirs(folder_rgg_variable)
+    #     os.makedirs(folder_rgg_varible_towers)
+    #     os.makedirs(folder_rgg_variable_radius)
 
-    towers = [50, 100, 200, 350]
-    radius = [(100, 300), (150, 300), (200, 300), (250, 300)]
-
-    #Aggregation with respect to towers number
-    for rad1, rad2 in radius:
-        for tower in towers:
-            lst_times_opt = []
-            lst_times_sc = []
-            lst_times_t = []
-
-            lst_towers_opt = []
-            lst_towers_sc = []
-            lst_towers_t = []
-
-            lst_time_confidences_opt = []
-            lst_time_confidences_sc = []
-            lst_time_confidences_t = []
-
-            lst_tower_confidences_opt = []
-            lst_tower_confidences_sc = []
-            lst_tower_confidences_t = []
-            res_name = os.path.join(folder_rgg_varible_towers, f"aggTowers_rad{(rad1, rad2)}_nt{tower}.png")
-            for trj in trajectories:
-                if tower < 100 and rad1 < 200:
-                    lst_times_opt.append(0)
-                    lst_times_sc.append(0)
-                    lst_times_t.append(0)
-
-                    lst_time_confidences_opt.append((0, 0))
-                    lst_time_confidences_sc.append((0, 0))
-                    lst_time_confidences_t.append((0, 0))
-
-                    lst_towers_opt.append(0)
-                    lst_towers_sc.append(0)
-                    lst_towers_t.append(0)
-
-                    lst_tower_confidences_opt.append((0, 0))
-                    lst_tower_confidences_sc.append((0, 0))
-                    lst_tower_confidences_t.append((0, 0))
-                    continue
-
-                csv_name = f"result_a1000_t{tower}_rmin{rad1}_rmax{rad2}_nt{trj}_ts666.csv"
-                csv = pd.read_csv(os.path.join("exp", "rgg_variable", csv_name))
-
-                lst_times_opt.append(csv["time_opt"].mean())
-                lst_times_sc.append(csv["time_e_sc_mept"].mean())
-                lst_times_t.append(csv["time_e_t_mept"].mean())
-
-                lst_time_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]), scale=st.sem(csv["time_opt"])))
-                lst_time_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]), scale=st.sem(csv["time_e_sc_mept"])))
-                lst_time_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]), scale=st.sem(csv["time_e_t_mept"])))
-
-                lst_towers_opt.append(csv["total_towers_opt"].mean())
-                lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
-                lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
-
-                lst_tower_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_tower_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_tower_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-            plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t], [lst_times_opt, lst_times_sc, lst_times_t], [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t], [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
-
-    # Aggregation with respect to towers number
-    for tower in towers:
-        for rad1, rad2 in radius:
-            lst_times_opt = []
-            lst_times_sc = []
-            lst_times_t = []
-
-            lst_towers_opt = []
-            lst_towers_sc = []
-            lst_towers_t = []
-
-            lst_time_confidences_opt = []
-            lst_time_confidences_sc = []
-            lst_time_confidences_t = []
-
-            lst_tower_confidences_opt = []
-            lst_tower_confidences_sc = []
-            lst_tower_confidences_t = []
-            res_name = os.path.join(folder_rgg_variable_radius, f"aggRad_rad{(rad1, rad2)}_nt{tower}.png")
-            for trj in trajectories:
-                if tower < 100 and rad1 < 200:
-                    lst_times_opt.append(0)
-                    lst_times_sc.append(0)
-                    lst_times_t.append(0)
-
-                    lst_time_confidences_opt.append((0, 0))
-                    lst_time_confidences_sc.append((0, 0))
-                    lst_time_confidences_t.append((0, 0))
-
-                    lst_towers_opt.append(0)
-                    lst_towers_sc.append(0)
-                    lst_towers_t.append(0)
-
-                    lst_tower_confidences_opt.append((0, 0))
-                    lst_tower_confidences_sc.append((0, 0))
-                    lst_tower_confidences_t.append((0, 0))
-                    continue
-
-                csv_name = f"result_a1000_t{tower}_rmin{rad1}_rmax{rad2}_nt{trj}_ts666.csv"
-                csv = pd.read_csv(os.path.join("exp", "rgg_variable", csv_name))
-
-                lst_times_opt.append(csv["time_opt"].mean())
-                lst_times_sc.append(csv["time_e_sc_mept"].mean())
-                lst_times_t.append(csv["time_e_t_mept"].mean())
-
-                lst_time_confidences_opt.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_time_confidences_sc.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_time_confidences_t.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-                lst_towers_opt.append(csv["total_towers_opt"].mean())
-                lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
-                lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
-
-                lst_tower_confidences_opt.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
-                                  scale=st.sem(csv["time_opt"])))
-                lst_tower_confidences_sc.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
-                                  scale=st.sem(csv["time_e_sc_mept"])))
-                lst_tower_confidences_t.append(
-                    st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
-                                  scale=st.sem(csv["time_e_t_mept"])))
-
-            plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t],
-                           [lst_times_opt, lst_times_sc, lst_times_t],
-                           [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t],
-                           [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
+    # towers = [50, 100, 200, 350]
+    # radius = [(100, 300), (150, 300), (200, 300), (250, 300)]
+    #
+    # #Aggregation with respect to towers number
+    # for rad1, rad2 in radius:
+    #     for tower in towers:
+    #         lst_times_opt = []
+    #         lst_times_sc = []
+    #         lst_times_t = []
+    #
+    #         lst_towers_opt = []
+    #         lst_towers_sc = []
+    #         lst_towers_t = []
+    #
+    #         lst_time_confidences_opt = []
+    #         lst_time_confidences_sc = []
+    #         lst_time_confidences_t = []
+    #
+    #         lst_tower_confidences_opt = []
+    #         lst_tower_confidences_sc = []
+    #         lst_tower_confidences_t = []
+    #         res_name = os.path.join(folder_rgg_varible_towers, f"aggTowers_rad{(rad1, rad2)}_nt{tower}.png")
+    #         for trj in trajectories:
+    #             if tower < 100 and rad1 < 200:
+    #                 lst_times_opt.append(0)
+    #                 lst_times_sc.append(0)
+    #                 lst_times_t.append(0)
+    #
+    #                 lst_time_confidences_opt.append((0, 0))
+    #                 lst_time_confidences_sc.append((0, 0))
+    #                 lst_time_confidences_t.append((0, 0))
+    #
+    #                 lst_towers_opt.append(0)
+    #                 lst_towers_sc.append(0)
+    #                 lst_towers_t.append(0)
+    #
+    #                 lst_tower_confidences_opt.append((0, 0))
+    #                 lst_tower_confidences_sc.append((0, 0))
+    #                 lst_tower_confidences_t.append((0, 0))
+    #                 continue
+    #
+    #             csv_name = f"result_a1000_t{tower}_rmin{rad1}_rmax{rad2}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "rgg_variable", csv_name))
+    #
+    #             lst_times_opt.append(csv["time_opt"].mean())
+    #             lst_times_sc.append(csv["time_e_sc_mept"].mean())
+    #             lst_times_t.append(csv["time_e_t_mept"].mean())
+    #
+    #             lst_time_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]), scale=st.sem(csv["time_opt"])))
+    #             lst_time_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]), scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_time_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]), scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #             lst_towers_opt.append(csv["total_towers_opt"].mean())
+    #             lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
+    #             lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
+    #
+    #             lst_tower_confidences_opt.append(st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_tower_confidences_sc.append(st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_tower_confidences_t.append(st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #         plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t], [lst_times_opt, lst_times_sc, lst_times_t], [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t], [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
+    #
+    # # Aggregation with respect to towers number
+    # for tower in towers:
+    #     for rad1, rad2 in radius:
+    #         lst_times_opt = []
+    #         lst_times_sc = []
+    #         lst_times_t = []
+    #
+    #         lst_towers_opt = []
+    #         lst_towers_sc = []
+    #         lst_towers_t = []
+    #
+    #         lst_time_confidences_opt = []
+    #         lst_time_confidences_sc = []
+    #         lst_time_confidences_t = []
+    #
+    #         lst_tower_confidences_opt = []
+    #         lst_tower_confidences_sc = []
+    #         lst_tower_confidences_t = []
+    #         res_name = os.path.join(folder_rgg_variable_radius, f"aggRad_rad{(rad1, rad2)}_nt{tower}.png")
+    #         for trj in trajectories:
+    #             if tower < 100 and rad1 < 200:
+    #                 lst_times_opt.append(0)
+    #                 lst_times_sc.append(0)
+    #                 lst_times_t.append(0)
+    #
+    #                 lst_time_confidences_opt.append((0, 0))
+    #                 lst_time_confidences_sc.append((0, 0))
+    #                 lst_time_confidences_t.append((0, 0))
+    #
+    #                 lst_towers_opt.append(0)
+    #                 lst_towers_sc.append(0)
+    #                 lst_towers_t.append(0)
+    #
+    #                 lst_tower_confidences_opt.append((0, 0))
+    #                 lst_tower_confidences_sc.append((0, 0))
+    #                 lst_tower_confidences_t.append((0, 0))
+    #                 continue
+    #
+    #             csv_name = f"result_a1000_t{tower}_rmin{rad1}_rmax{rad2}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "rgg_variable", csv_name))
+    #
+    #             lst_times_opt.append(csv["time_opt"].mean())
+    #             lst_times_sc.append(csv["time_e_sc_mept"].mean())
+    #             lst_times_t.append(csv["time_e_t_mept"].mean())
+    #
+    #             lst_time_confidences_opt.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_time_confidences_sc.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_time_confidences_t.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #             lst_towers_opt.append(csv["total_towers_opt"].mean())
+    #             lst_towers_sc.append(csv["total_towers_e_sc_mept"].mean())
+    #             lst_towers_t.append(csv["total_towers_e_t_mept"].mean())
+    #
+    #             lst_tower_confidences_opt.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_opt"]) - 1, loc=np.mean(csv["time_opt"]),
+    #                               scale=st.sem(csv["time_opt"])))
+    #             lst_tower_confidences_sc.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_sc_mept"]) - 1, loc=np.mean(csv["time_e_sc_mept"]),
+    #                               scale=st.sem(csv["time_e_sc_mept"])))
+    #             lst_tower_confidences_t.append(
+    #                 st.t.interval(alpha=0.95, df=len(csv["time_e_t_mept"]) - 1, loc=np.mean(csv["time_e_t_mept"]),
+    #                               scale=st.sem(csv["time_e_t_mept"])))
+    #
+    #         plot_aggregate(res_name, trajectories, [lst_towers_opt, lst_towers_sc, lst_towers_t],
+    #                        [lst_times_opt, lst_times_sc, lst_times_t],
+    #                        [lst_tower_confidences_opt, lst_tower_confidences_sc, lst_tower_confidences_t],
+    #                        [lst_time_confidences_opt, lst_time_confidences_sc, lst_time_confidences_t])
     # ====================================================================================
 
 
     #====================== Manhattan Diagonal Together ==================================
-    towers = [4 ** 2, 6 ** 2, 7 ** 2, 8 ** 2, 10 ** 2, 12 ** 2, 14 ** 2, 15 ** 2, 16 ** 2]
-    prefix_dia = os.path.join("exp", "diagonal")
-    prefix_mana = os.path.join("exp", "manhattan")
-    for tower in towers:
-        df_agg = pd.DataFrame(columns=["trajectories", "diagonal_time_opt", "diagonal_towers_opt", "diagonal_time_sc",
-                                       "diagonal_towers_sc", "diagonal_time_t", "diagonal_towers_t", "manhattan_time_opt",
-                                       "manhattan_towers_opt", "manhattan_time_sc", "manhattan_towers_sc", "manhattan_time_t",
-                                       "manhattan_towers_t", "diagonal_time_opt_conf", "diagonal_towers_opt_conf", "diagonal_time_sc_conf",
-                                       "diagonal_towers_sc_conf", "diagonal_time_t_conf", "diagonal_towers_t_conf", "manhattan_time_opt_conf",
-                                       "manhattan_towers_opt_conf", "manhattan_time_sc_conf", "manhattan_towers_sc_conf", "manhattan_time_t_conf",
-                                       "manhattan_towers_t_conf"])
-        for trj in trajectories:
-            file_name = f"result_a1000_t{tower}_nt{trj}_ts666.csv"
-
-            csv_dia = pd.read_csv(os.path.join(prefix_dia, file_name))
-            csv_mana = pd.read_csv(os.path.join(prefix_mana, file_name))
-
-            row = [
-                trj, csv_dia["time_opt"].mean(), csv_dia["total_towers_opt"].mean(), csv_dia["time_e_sc_mept"].mean(),
-                csv_dia["total_towers_e_sc_mept"].mean(), csv_dia["time_e_t_mept"].mean(), csv_dia["total_towers_e_t_mept"].mean(),
-                csv_mana["time_opt"].mean(), csv_mana["total_towers_opt"].mean(), csv_mana["time_e_sc_mept"].mean(),
-                csv_mana["total_towers_e_sc_mept"].mean(), csv_mana["time_e_t_mept"].mean(), csv_mana["total_towers_e_t_mept"].mean(),
-                get_confidence(csv_dia["time_opt"].tolist()), get_confidence(csv_dia["total_towers_opt"].tolist()), get_confidence(csv_dia["time_e_sc_mept"].tolist()),
-                get_confidence(csv_dia["total_towers_e_sc_mept"].tolist()), get_confidence(csv_dia["time_e_t_mept"].tolist()),
-                get_confidence(csv_dia["total_towers_e_t_mept"].tolist()),
-                get_confidence(csv_mana["time_opt"].tolist()), get_confidence(csv_mana["total_towers_opt"].tolist()), get_confidence(csv_mana["time_e_sc_mept"].tolist()),
-                get_confidence(csv_mana["total_towers_e_sc_mept"].tolist()), get_confidence(csv_mana["time_e_t_mept"].tolist()),
-                get_confidence(csv_mana["total_towers_e_t_mept"].tolist())]
-            df_agg.loc[len(df_agg.index)] = row
-        if not os.path.exists(os.path.join(prefix_dia, "aggregated")):
-            os.makedirs(os.path.join(prefix_dia, "aggregated"))
-        dst_name = os.path.join(prefix_dia, "aggregated", f"aggTower_dia_mana_t{tower}.png")
-        plot_bars_with_confidence(df_agg, dst_name)
+    # towers = [4 ** 2, 6 ** 2, 7 ** 2, 8 ** 2, 10 ** 2, 12 ** 2, 14 ** 2, 15 ** 2, 16 ** 2]
+    # prefix_dia = os.path.join("exp", "diagonal")
+    # prefix_mana = os.path.join("exp", "manhattan")
+    # for tower in towers:
+    #     df_agg = pd.DataFrame(columns=["trajectories", "diagonal_time_opt", "diagonal_towers_opt", "diagonal_time_sc",
+    #                                    "diagonal_towers_sc", "diagonal_time_t", "diagonal_towers_t", "manhattan_time_opt",
+    #                                    "manhattan_towers_opt", "manhattan_time_sc", "manhattan_towers_sc", "manhattan_time_t",
+    #                                    "manhattan_towers_t", "diagonal_time_opt_conf", "diagonal_towers_opt_conf", "diagonal_time_sc_conf",
+    #                                    "diagonal_towers_sc_conf", "diagonal_time_t_conf", "diagonal_towers_t_conf", "manhattan_time_opt_conf",
+    #                                    "manhattan_towers_opt_conf", "manhattan_time_sc_conf", "manhattan_towers_sc_conf", "manhattan_time_t_conf",
+    #                                    "manhattan_towers_t_conf"])
+    #     for trj in trajectories:
+    #         file_name = f"result_a1000_t{tower}_nt{trj}_ts666.csv"
+    #
+    #         csv_dia = pd.read_csv(os.path.join(prefix_dia, file_name))
+    #         csv_mana = pd.read_csv(os.path.join(prefix_mana, file_name))
+    #
+    #         row = [
+    #             trj, csv_dia["time_opt"].mean(), csv_dia["total_towers_opt"].mean(), csv_dia["time_e_sc_mept"].mean(),
+    #             csv_dia["total_towers_e_sc_mept"].mean(), csv_dia["time_e_t_mept"].mean(), csv_dia["total_towers_e_t_mept"].mean(),
+    #             csv_mana["time_opt"].mean(), csv_mana["total_towers_opt"].mean(), csv_mana["time_e_sc_mept"].mean(),
+    #             csv_mana["total_towers_e_sc_mept"].mean(), csv_mana["time_e_t_mept"].mean(), csv_mana["total_towers_e_t_mept"].mean(),
+    #             get_confidence(csv_dia["time_opt"].tolist()), get_confidence(csv_dia["total_towers_opt"].tolist()), get_confidence(csv_dia["time_e_sc_mept"].tolist()),
+    #             get_confidence(csv_dia["total_towers_e_sc_mept"].tolist()), get_confidence(csv_dia["time_e_t_mept"].tolist()),
+    #             get_confidence(csv_dia["total_towers_e_t_mept"].tolist()),
+    #             get_confidence(csv_mana["time_opt"].tolist()), get_confidence(csv_mana["total_towers_opt"].tolist()), get_confidence(csv_mana["time_e_sc_mept"].tolist()),
+    #             get_confidence(csv_mana["total_towers_e_sc_mept"].tolist()), get_confidence(csv_mana["time_e_t_mept"].tolist()),
+    #             get_confidence(csv_mana["total_towers_e_t_mept"].tolist())]
+    #         df_agg.loc[len(df_agg.index)] = row
+    #     if not os.path.exists(os.path.join(prefix_dia, "aggregated")):
+    #         os.makedirs(os.path.join(prefix_dia, "aggregated"))
+    #     dst_name = os.path.join(prefix_dia, "aggregated", f"aggTower_dia_mana_t{tower}.png")
+    #     plot_algorithm_diagonal_manhattan(df_agg, dst_name)
     
     # ====================================================================================
 
     #================================ Lattice ============================================
-
+    # towers = [5, 10, 15, 20]
+    # lattice_neighbors = [2, 4, 6]
+    #
+    # folder_lattice = os.path.join("exp", "lattice", "aggregated")
+    # if not os.path.exists(folder_lattice):
+    #     os.makedirs(folder_lattice)
+    #
+    # for tower in towers:
+    #     for lattice in lattice_neighbors:
+    #         res = pd.DataFrame(columns=[
+    #             "trajectories", "opt_time", "opt_towers", "e_sc_mept_time", "e_sc_mept_towers", "e_t_mept_time",
+    #             "e_t_mept_towers", "opt_time_conf", "opt_towers_conf", "e_sc_mept_time_conf", "e_sc_mept_towers_conf",
+    #             "e_t_mept_time_conf", "e_t_mept_towers_conf"
+    #         ])
+    #         for trj in trajectories:
+    #             if lattice > tower / 2:
+    #                 res.loc[len(res.index)] = [trj, 0, 0, 0, 0, 0, 0, (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+    #                 continue
+    #             csv_name = f"result_a1000_t{tower}_neig{lattice}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "lattice", csv_name))
+    #             res.loc[len(res.index)] = [
+    #                 trj, csv["time_opt"].mean(), csv["total_towers_opt"].mean(), csv["time_e_sc_mept"].mean(), csv["total_towers_e_sc_mept"].mean(),
+    #                 csv["time_e_t_mept"].mean(), csv["total_towers_e_t_mept"].mean(), get_confidence(csv["time_opt"].tolist()), get_confidence(csv["total_towers_opt"].tolist()),
+    #                 get_confidence(csv["time_e_sc_mept"].tolist()), get_confidence(csv["total_towers_e_sc_mept"].tolist()), get_confidence(csv["time_e_t_mept"].tolist()), get_confidence(csv["total_towers_e_t_mept"].tolist())
+    #                    ]
+    #         res_name = f"aggNeigh_ng{lattice}_t{tower}.png"
+    #         plot_aggregate(os.path.join(folder_lattice, res_name), trajectories, [res["opt_towers"].tolist(), res["e_sc_mept_towers"].tolist(), res["e_t_mept_towers"].tolist()], [res["opt_time"].tolist(), res["e_sc_mept_time"].tolist(), res["e_t_mept_time"].tolist()],
+    #                        [res["opt_towers_conf"], res["e_sc_mept_towers_conf"], res["e_t_mept_towers_conf"]],
+    #                        [res["opt_time_conf"].tolist(), res["e_sc_mept_time_conf"].tolist(), res["e_t_mept_time_conf"].tolist()])
+    # for lattice in lattice_neighbors:
+    #     for tower in towers:
+    #         res = pd.DataFrame(columns=[
+    #             "trajectories", "opt_time", "opt_towers", "e_sc_mept_time", "e_sc_mept_towers", "e_t_mept_time",
+    #             "e_t_mept_towers", "opt_time_conf", "opt_towers_conf", "e_sc_mept_time_conf", "e_sc_mept_towers_conf",
+    #             "e_t_mept_time_conf", "e_t_mept_towers_conf"
+    #         ])
+    #         for trj in trajectories:
+    #             if lattice > tower / 2:
+    #                 res.loc[len(res.index)] = [trj, 0, 0, 0, 0, 0, 0, (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+    #                 continue
+    #             csv_name = f"result_a1000_t{tower}_neig{lattice}_nt{trj}_ts666.csv"
+    #             csv = pd.read_csv(os.path.join("exp", "lattice", csv_name))
+    #             res.loc[len(res.index)] = [
+    #                 trj, csv["time_opt"].mean(), csv["total_towers_opt"].mean(), csv["time_e_sc_mept"].mean(), csv["total_towers_e_sc_mept"].mean(),
+    #                 csv["time_e_t_mept"].mean(), csv["total_towers_e_t_mept"].mean(), get_confidence(csv["time_opt"].tolist()), get_confidence(csv["total_towers_opt"].tolist()),
+    #                 get_confidence(csv["time_e_sc_mept"].tolist()), get_confidence(csv["total_towers_e_sc_mept"].tolist()), get_confidence(csv["time_e_t_mept"].tolist()), get_confidence(csv["total_towers_e_t_mept"].tolist())
+    #                    ]
+    #         res_name = f"aggTower_ng{lattice}_t{tower}.png"
+    #         plot_aggregate(os.path.join(folder_lattice, res_name), trajectories, [res["opt_towers"].tolist(), res["e_sc_mept_towers"].tolist(), res["e_t_mept_towers"].tolist()], [res["opt_time"].tolist(), res["e_sc_mept_time"].tolist(), res["e_t_mept_time"].tolist()],
+    #                        [res["opt_towers_conf"], res["e_sc_mept_towers_conf"], res["e_t_mept_towers_conf"]],
+    #                        [res["opt_time_conf"].tolist(), res["e_sc_mept_time_conf"].tolist(), res["e_t_mept_time_conf"].tolist()])
     # ====================================================================================
 
     # ===================================== Star =========================================
+    star_edges = [5, 7, 10, 12]
+    towers = [31, 57, 111, 157]
 
+    folder_lattice = os.path.join("exp", "star", "aggregated")
+    if not os.path.exists(folder_lattice):
+        os.makedirs(folder_lattice)
+
+    for tower in towers:
+        for star in star_edges:
+            res = pd.DataFrame(columns=[
+                "trajectories", "opt_time", "opt_towers", "e_sc_mept_time", "e_sc_mept_towers", "e_t_mept_time",
+                "e_t_mept_towers", "opt_time_conf", "opt_towers_conf", "e_sc_mept_time_conf", "e_sc_mept_towers_conf",
+                "e_t_mept_time_conf", "e_t_mept_towers_conf"
+            ])
+            for trj in trajectories:
+                csv_name = f"result_a1000_t{tower}_star{star}_nt{trj}_ts666.csv"
+                if not os.path.exists(os.path.join("exp", "star", csv_name)):
+                    res.loc[len(res.index)] = [trj, 0, 0, 0, 0, 0, 0, (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+                    continue
+                csv = pd.read_csv(os.path.join("exp", "star", csv_name))
+                res.loc[len(res.index)] = [
+                    trj, csv["time_opt"].mean(), csv["total_towers_opt"].mean(), csv["time_e_sc_mept"].mean(),
+                    csv["total_towers_e_sc_mept"].mean(),
+                    csv["time_e_t_mept"].mean(), csv["total_towers_e_t_mept"].mean(),
+                    get_confidence(csv["time_opt"].tolist()), get_confidence(csv["total_towers_opt"].tolist()),
+                    get_confidence(csv["time_e_sc_mept"].tolist()),
+                    get_confidence(csv["total_towers_e_sc_mept"].tolist()),
+                    get_confidence(csv["time_e_t_mept"].tolist()), get_confidence(csv["total_towers_e_t_mept"].tolist())
+                ]
+            res_name = f"aggStar_star{star}_t{tower}.png"
+            plot_aggregate(os.path.join(folder_lattice, res_name), trajectories,
+                           [res["opt_towers"].tolist(), res["e_sc_mept_towers"].tolist(),
+                            res["e_t_mept_towers"].tolist()],
+                           [res["opt_time"].tolist(), res["e_sc_mept_time"].tolist(), res["e_t_mept_time"].tolist()],
+                           [res["opt_towers_conf"], res["e_sc_mept_towers_conf"], res["e_t_mept_towers_conf"]],
+                           [res["opt_time_conf"].tolist(), res["e_sc_mept_time_conf"].tolist(),
+                            res["e_t_mept_time_conf"].tolist()])
+    for star in star_edges:
+        for tower in towers:
+            res = pd.DataFrame(columns=[
+                "trajectories", "opt_time", "opt_towers", "e_sc_mept_time", "e_sc_mept_towers", "e_t_mept_time",
+                "e_t_mept_towers", "opt_time_conf", "opt_towers_conf", "e_sc_mept_time_conf", "e_sc_mept_towers_conf",
+                "e_t_mept_time_conf", "e_t_mept_towers_conf"
+            ])
+            for trj in trajectories:
+                csv_name = f"result_a1000_t{tower}_star{star}_nt{trj}_ts666.csv"
+                if not os.path.exists(os.path.join("exp", "star", csv_name)):
+                    res.loc[len(res.index)] = [trj, 0, 0, 0, 0, 0, 0, (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0)]
+                    continue
+                csv = pd.read_csv(os.path.join("exp", "star", csv_name))
+                res.loc[len(res.index)] = [
+                    trj, csv["time_opt"].mean(), csv["total_towers_opt"].mean(), csv["time_e_sc_mept"].mean(),
+                    csv["total_towers_e_sc_mept"].mean(),
+                    csv["time_e_t_mept"].mean(), csv["total_towers_e_t_mept"].mean(),
+                    get_confidence(csv["time_opt"].tolist()), get_confidence(csv["total_towers_opt"].tolist()),
+                    get_confidence(csv["time_e_sc_mept"].tolist()),
+                    get_confidence(csv["total_towers_e_sc_mept"].tolist()),
+                    get_confidence(csv["time_e_t_mept"].tolist()), get_confidence(csv["total_towers_e_t_mept"].tolist())
+                ]
+            res_name = f"aggTower_star{star}_t{tower}.png"
+            plot_aggregate(os.path.join(folder_lattice, res_name), trajectories,
+                           [res["opt_towers"].tolist(), res["e_sc_mept_towers"].tolist(),
+                            res["e_t_mept_towers"].tolist()],
+                           [res["opt_time"].tolist(), res["e_sc_mept_time"].tolist(), res["e_t_mept_time"].tolist()],
+                           [res["opt_towers_conf"], res["e_sc_mept_towers_conf"], res["e_t_mept_towers_conf"]],
+                           [res["opt_time_conf"].tolist(), res["e_sc_mept_time_conf"].tolist(),
+                            res["e_t_mept_time_conf"].tolist()])
     # ====================================================================================
 
 
