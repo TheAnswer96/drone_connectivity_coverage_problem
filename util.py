@@ -333,7 +333,63 @@ def plot_experiment_results(csv_path):
 
     print(f"Plot saved to {img_path}")
 
-def plot_aggregate(dst, x, towers, times, conf_towers, conf_times):
+
+def plot_aggregate(dst, data1, data2=None):
+    x = data1["trajectories"].tolist()
+
+    if not data2 is None:
+        max_tower = max(max(data1["opt"]), max(data1["e_sc_mept"]), max(data1["e_t_mept"]), max(data2["opt"]), max(data2["e_sc_mept"]), max(data2["e_t_mept"]))
+        #data1
+        fig, axes = plt.subplots(1, 2, figsize=(10, 8))
+        plt.setp(axes, ylim=(0, max_tower+10))
+        axes[0].set_title('Diagonal')
+        axes[0].locator_params(axis='y', nbins=4)
+        axes[0].errorbar(x, data1["opt"], yerr=data1["opt_std"], label='OPT', color='blue', marker='o', capsize=5)
+        axes[0].errorbar(x, data1["e_sc_mept"], yerr=data1["e_sc_mept_std"], label='E_SC_MEPT', color='green', marker='*',
+                      capsize=5)
+        axes[0].errorbar(x, data1["e_t_mept"], yerr=data1["e_t_mept_std"], label='E_T_MEPT', color='red', marker='s',
+                      capsize=5)
+        axes[0].set_ylabel('Towers')
+        axes[0].legend()
+        axes[0].set_xticks(x)
+        axes[0].grid(True)
+
+        #data2
+        axes[1].set_title('Manhattan')
+        axes[1].locator_params(axis='y', nbins=4)
+        axes[1].errorbar(x, data2["opt"], yerr=data2["opt_std"], label='OPT', color='blue', marker='o', capsize=5)
+        axes[1].errorbar(x, data2["e_sc_mept"], yerr=data2["e_sc_mept_std"], label='E_SC_MEPT', color='green',
+                            marker='*',
+                            capsize=5)
+        axes[1].errorbar(x, data2["e_t_mept"], yerr=data2["e_t_mept_std"], label='E_T_MEPT', color='red', marker='s',
+                            capsize=5)
+        axes[1].set_ylabel('Towers')
+        axes[1].legend()
+        axes[1].set_xticks(x)
+        axes[1].grid(True)
+
+    else:
+        fig, axes = plt.subplots(1, 1, figsize=(10, 8))
+        axes.set_title('Total Towers')
+
+        axes.locator_params(axis='y', nbins=4)
+        axes.errorbar(x, data1["opt"], yerr=data1["opt_std"], label='OPT', color='blue', marker='o', capsize=5)
+        axes.errorbar(x, data1["e_sc_mept"], yerr=data1["e_sc_mept_std"], label='E_SC_MEPT', color='green', marker='*', capsize=5)
+        axes.errorbar(x, data1["e_t_mept"], yerr=data1["e_t_mept_std"], label='E_T_MEPT', color='red', marker='s', capsize=5)
+        axes.set_ylabel('Towers')
+        axes.legend()
+        axes.set_xticks(x)
+        axes.grid(True)
+
+    plt.tight_layout()
+    plt.savefig(dst)
+    plt.close()
+
+    print(f"Plot saved to {dst}")
+    return
+
+###### deprecated
+def plot_aggregate_deprecated(dst, x, towers, times, conf_towers, conf_times):
     # Helper function to ensure all confidence interval values are non-negative
     def compute_confidence(conf_intervals):
         return [(max(0, low), max(0, high)) for low, high in conf_intervals]
@@ -391,7 +447,7 @@ def plot_aggregate(dst, x, towers, times, conf_towers, conf_times):
 
     print(f"Plot saved to {dst}")
     return
-
+################################################
 def get_exp_name(scenario, min_rad, max_rad, towers, area, neighbors, star, n_traj, traject_size, dict_sc):
     folder_exp = "exp"
     subfolder_exp = dict_sc[scenario]
