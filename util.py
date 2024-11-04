@@ -643,20 +643,21 @@ def plot_aggregate_new(dst, data1, xaxis, xlabel):
 def plot_statistics(dst, data1, xaxis, xlabel):
     x = data1[xaxis].tolist()
 
-    fig, axes = plt.subplots(1, 1, figsize=(6, 4))
+    fig, axes = plt.subplots(1, 1, figsize=(3, 3))
     # axes.set_title('Total Towers')
 
     axes.locator_params(axis='y', nbins=4)
-    axes.bar(x, data1["ecc_opt"], yerr=data1["ecc_opt_std"], label='Eccentricity', color='magenta', capsize=5)
-    axes.set_ylabel('Towers')
-    axes.set_xlabel(xlabel)
-    axes.legend()
+    axes.bar(x, data1["ecc_opt"], yerr=data1["ecc_opt_std"], color='magenta', capsize=5)
+    axes.set_ylabel('Eccentricity')
+    # axes.set_xlabel(xlabel)
+    # axes.legend()
     axes.set_xticks(x)
-    axes.set_xticklabels(x, rotation=75)
+    axes.set_xticklabels(x, rotation=60)
+    axes.tick_params(axis='x', labelsize=8)
     axes.grid(True)
 
     plt.tight_layout()
-    plt.savefig(dst)
+    plt.savefig(dst, bbox_inches='tight')  # Remove white space
     plt.close()
 
     print(f"Plot saved to {dst}")

@@ -1015,6 +1015,7 @@ def new_plots():
     # =================== Statistics =========================================
     result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
     result_stat_csv = result_stat_csv[0:0]
+    i = 0
 
     # =================== On RGG: Impact Trajectories Number =========================================
     trajectories = [1, 10, 20, 50, 100]
@@ -1042,7 +1043,6 @@ def new_plots():
         plot_aggregate_new(out_file_name, result_csv, "trajectories", 'Number of Trajectories')
 
     # =================== On RGG: Impact of Radius =========================================
-    i = 0
     trj = 100
     radii = [100, 150, 200, 250, 300]
     towers = [100, 200]
@@ -1070,7 +1070,7 @@ def new_plots():
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
             if (tower == 100 and rad == 200) or (tower == 100 and rad == 300) or (tower == 200 and rad == 100) or (tower == 200 and rad == 300):
-                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"RGG t={tower} r={rad}", np.mean(ecc), np.std(ecc)]
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nr={rad}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
 
         plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius')
@@ -1103,8 +1103,9 @@ def new_plots():
             result_csv.loc[len(result_csv.index)] = [rad, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-            if (tower == 100 and rad == 200) or (tower == 200 and rad == 100):
-                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"RGG var t={tower} rmin={rad}", np.mean(ecc), np.std(ecc)]
+            # if (tower == 100 and rad == 200) or (tower == 200 and rad == 100):
+            if (tower == 100 and rad == 100) or (tower == 100 and rad == 200) or (tower == 200 and rad == 100) or (tower == 200 and rad == 200):
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nrm={rad}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
 
         plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius min')
@@ -1137,11 +1138,18 @@ def new_plots():
             result_csv.loc[len(result_csv.index)] = [tower, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-            # result_stat_csv.loc[len(result_stat_csv.index)] = [i, np.mean(ecc), np.std(ecc)]
+            # result_stat_csv.loc[len(result_stat_csv.index)] = [i, np.mean(ecc)-1, np.std(ecc)]
             # i = i + 1
 
         plot_aggregate_new(out_file_name, result_csv, "tower", 'Number of Towers')
 
+    # =================== Statistics RGG =========================================
+    out_file_name = os.path.join(folder_out, f"9_statistics_rgg.pdf")
+    plot_statistics(out_file_name, result_stat_csv, "label", 'RGG: fixed vs variable')
+
+    result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
+    result_stat_csv = result_stat_csv[0:0]
+    i = 0
 
     # =================== On Grids: Impact of Grid Size =========================================
     trj = 100
@@ -1166,12 +1174,20 @@ def new_plots():
             result_csv.loc[len(result_csv.index)] = [np.sqrt(tower), np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-            if (tower == 6 ** 2) or (tower == 8 ** 2) or (tower == 10 ** 2):
-                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"{scenario} side={int(np.sqrt(tower))}", np.mean(ecc), np.std(ecc)]
+            if (tower == 6 ** 2) or (tower == 8 ** 2) or (tower == 10 ** 2) or (tower == 12 ** 2):
+                lab = scenario[0].upper()
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"{lab} s={int(np.sqrt(tower))}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
 
         plot_aggregate_new(out_file_name, result_csv, "side", 'Side of Grid')
 
+    # =================== Statistics Grid =========================================
+    out_file_name = os.path.join(folder_out, f"9_statistics_grids.pdf")
+    plot_statistics(out_file_name, result_stat_csv, "label", 'Grids: Manhattan vs Diagonal')
+
+    result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
+    result_stat_csv = result_stat_csv[0:0]
+    i = 0
 
     # =================== On Lattices: Impact of Neighboring =========================================
     trj = 100
@@ -1196,11 +1212,19 @@ def new_plots():
             result_csv.loc[len(result_csv.index)] = [neig, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                      np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-            if (neig == 2) or (neig == 6):
-                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"Lattice t={tower} neighb={neig}", np.mean(ecc), np.std(ecc)]
-                i = i + 1
+            # if (neig == 2) or (neig == 6):
+            result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nn={neig}", np.mean(ecc)-1, np.std(ecc)]
+            i = i + 1
 
         plot_aggregate_new(out_file_name, result_csv, "neig", 'Neighboring factor')
+
+    # =================== Statistics Grid =========================================
+    out_file_name = os.path.join(folder_out, f"9_statistics_lattice.pdf")
+    plot_statistics(out_file_name, result_stat_csv, "label", 'Lattice')
+
+    result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
+    result_stat_csv = result_stat_csv[0:0]
+    i = 0
 
 
     # =================== On Stars: Impact of Edges Number =========================================
@@ -1225,12 +1249,12 @@ def new_plots():
         result_csv.loc[len(result_csv.index)] = [star, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                  np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-        if star <= 10:
-            result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"Star edges={star}", np.mean(ecc), np.std(ecc)]
-            i = i + 1
+        # if star <= 10:
+        result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"e={star}", np.mean(ecc)-1, np.std(ecc)]
+        i = i + 1
 
     plot_aggregate_new(out_file_name, result_csv, "star", 'Number of edges')
 
     # =================== Statistics =========================================
-    out_file_name = os.path.join(folder_out, f"9_statistics.pdf")
+    out_file_name = os.path.join(folder_out, f"9_statistics_star.pdf")
     plot_statistics(out_file_name, result_stat_csv, "label", 'Scenario')
