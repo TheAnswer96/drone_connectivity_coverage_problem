@@ -626,6 +626,7 @@ def plot_aggregate_new(dst, data1, xaxis, xlabel):
     axes.errorbar(x, data1["opt"], yerr=data1["opt_std"], label='OPT', color='blue', marker='o', capsize=5)
     axes.errorbar(x, data1["e_sc_mept"], yerr=data1["e_sc_mept_std"], label='E_SC', color='green', marker='*', capsize=5)
     axes.errorbar(x, data1["e_t_mept"], yerr=data1["e_t_mept_std"], label='E_T', color='red', marker='s', capsize=5)
+    axes.set_ylim(bottom=0)
     axes.set_ylabel('Towers')
     axes.set_xlabel(xlabel)
     axes.legend()
@@ -643,7 +644,7 @@ def plot_aggregate_new(dst, data1, xaxis, xlabel):
 def plot_statistics(dst, data1, xaxis, xlabel):
     x = data1[xaxis].tolist()
 
-    fig, axes = plt.subplots(1, 1, figsize=(3, 3))
+    fig, axes = plt.subplots(1, 1, figsize=(3, 2.5))
     # axes.set_title('Total Towers')
 
     axes.locator_params(axis='y', nbins=4)
