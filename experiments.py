@@ -499,7 +499,7 @@ def run_star(areas, towers, stars, n_traj, traj_sizes, iterations, dict_sc, debu
                                 "min_dist_trajectory": size,
                                 "scenario": 7,
                                 "lattice_neighbors": 0,
-                                "star_edges": star,
+                                "star_edges": s,
                                 "seed": i,
                                 "debug": debug
                             }
@@ -887,6 +887,7 @@ def get_plots_aggregated():
                 result_csv.loc[len(result_csv.index)] = [trj, np.mean(opt), np.mean(sc_mept), np.mean(t_mept), 
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
             plot_aggregate(res_name, result_csv)
+
     # =================== Aggregate RGG variable =========================================
     folder_rgg_variable = os.path.join("exp", "rgg_variable", "aggregated")
     if not os.path.exists(folder_rgg_variable):
@@ -949,6 +950,7 @@ def get_plots_aggregated():
             result_csv_manhattan.loc[len(result_csv_manhattan.index)] = [trj, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                                  np.std(opt), np.std(sc_mept), np.std(t_mept)]
         plot_aggregate(res_name, result_csv_diagonal, result_csv_manhattan)
+
     #==================================== Lattice =======================================================================
     towers = [5, 10, 15, 20]
     lattice_neighbors = [2, 4, 6]
@@ -1002,3 +1004,233 @@ def get_plots_aggregated():
                                                          np.std(opt), np.std(sc_mept), np.std(t_mept)]
             plot_aggregate(res_name, result_csv)
     return
+
+
+
+def new_plots():
+    folder_out = os.path.join("new_exp")
+    if not os.path.exists(folder_out):
+        os.makedirs(folder_out)
+
+    # =================== Statistics =========================================
+    result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
+    result_stat_csv = result_stat_csv[0:0]
+
+    # =================== On RGG: Impact Trajectories Number =========================================
+    trajectories = [1, 10, 20, 50, 100]
+    combos = [(100, 200), (200, 100)]
+
+    result_csv = pd.DataFrame(columns=["trajectories", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for tower, rad in combos:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"0_impact_trajectories_rad{rad}_tw{tower}.pdf")
+        for trj in trajectories:
+            raw_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", "rgg_fixed", raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            # ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [trj, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                     np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+
+        plot_aggregate_new(out_file_name, result_csv, "trajectories", 'Number of Trajectories')
+
+    # =================== On RGG: Impact of Radius =========================================
+    i = 0
+    trj = 100
+    radii = [100, 150, 200, 250, 300]
+    towers = [100, 200]
+
+    result_csv = pd.DataFrame(columns=["rad", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for tower in towers:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"1_impact_radius_tw{tower}.pdf")
+        for rad in radii:
+            if tower < 150 and rad < 200:
+                # result_csv.loc[len(result_csv.index)] = [rad, 0, 0, 0, 0, 0, 0]
+                continue
+
+            raw_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", "rgg_fixed", raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [rad, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                         np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+            if (tower == 100 and rad == 200) or (tower == 100 and rad == 300) or (tower == 200 and rad == 100) or (tower == 200 and rad == 300):
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"RGG t={tower} r={rad}", np.mean(ecc), np.std(ecc)]
+                i = i + 1
+
+        plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius')
+
+
+    # =================== On RGG: Impact of Radius (variable) =========================================
+    trj = 100
+    radii = [100, 150, 200, 250]
+    towers = [100, 200]
+
+    result_csv = pd.DataFrame(columns=["rad", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for tower in towers:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"2_impact_radius_var_tw{tower}.pdf")
+        for rad in radii:
+            # if tower < 150 and rad < 200:
+            #     # result_csv.loc[len(result_csv.index)] = [rad, 0, 0, 0, 0, 0, 0]
+            #     continue
+
+            raw_name = f"result_a1000_t{tower}_rmin{rad}_rmax{300}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", "rgg_variable", raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [rad, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                         np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+            if (tower == 100 and rad == 200) or (tower == 200 and rad == 100):
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"RGG var t={tower} rmin={rad}", np.mean(ecc), np.std(ecc)]
+                i = i + 1
+
+        plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius min')
+
+
+    # =================== On RGG: Impact of Towers Number =========================================
+    trj = 100
+    radii = [200, 300]
+    towers = [100, 200, 350]
+
+    result_csv = pd.DataFrame(columns=["tower", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for rad in radii:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"3_impact_towers_rad{rad}.pdf")
+        for tower in towers:
+            if tower < 150 and rad < 200:
+                # result_csv.loc[len(result_csv.index)] = [rad, 0, 0, 0, 0, 0, 0]
+                continue
+
+            raw_name = f"result_a1000_t{tower}_r{rad}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", "rgg_fixed", raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [tower, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                         np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+            # result_stat_csv.loc[len(result_stat_csv.index)] = [i, np.mean(ecc), np.std(ecc)]
+            # i = i + 1
+
+        plot_aggregate_new(out_file_name, result_csv, "tower", 'Number of Towers')
+
+
+    # =================== On Grids: Impact of Grid Size =========================================
+    trj = 100
+    scenarios = ['manhattan', 'diagonal']
+    towers = [4 ** 2, 6 ** 2, 7 ** 2, 8 ** 2, 10 ** 2, 12 ** 2, 14 ** 2, 15 ** 2, 16 ** 2]
+
+    result_csv = pd.DataFrame(columns=["side", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for scenario in scenarios:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"4_impact_grid_{scenario}.pdf")
+        for tower in towers:
+            raw_name = f"result_a1000_t{tower}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", scenario, raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [np.sqrt(tower), np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                         np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+            if (tower == 6 ** 2) or (tower == 8 ** 2) or (tower == 10 ** 2):
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"{scenario} side={int(np.sqrt(tower))}", np.mean(ecc), np.std(ecc)]
+                i = i + 1
+
+        plot_aggregate_new(out_file_name, result_csv, "side", 'Side of Grid')
+
+
+    # =================== On Lattices: Impact of Neighboring =========================================
+    trj = 100
+    neighbors = [2, 4, 6]
+    towers = [15, 20]
+
+    result_csv = pd.DataFrame(columns=["neig", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    for tower in towers:
+        result_csv = result_csv[0:0]
+        out_file_name = os.path.join(folder_out, f"5_impact_neighboring_tw{tower}.pdf")
+        for neig in neighbors:
+            raw_name = f"result_a1000_t{tower}_neig{neig}_nt{trj}_ts666.csv"
+            raw_csv = pd.read_csv(os.path.join("exp", "lattice", raw_name))
+
+            opt = np.array(raw_csv["total_towers_opt"].tolist())
+            sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+            t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+            ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+            result_csv.loc[len(result_csv.index)] = [neig, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                     np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+            if (neig == 2) or (neig == 6):
+                result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"Lattice t={tower} neighb={neig}", np.mean(ecc), np.std(ecc)]
+                i = i + 1
+
+        plot_aggregate_new(out_file_name, result_csv, "neig", 'Neighboring factor')
+
+
+    # =================== On Stars: Impact of Edges Number =========================================
+    trj = 100
+    edges = [5, 7, 10, 12]
+
+    result_csv = pd.DataFrame(columns=["star", "opt", "e_sc_mept", "e_t_mept",
+                                       "opt_std", "e_sc_mept_std", "e_t_mept_std"])
+
+    result_csv = result_csv[0:0]
+    out_file_name = os.path.join(folder_out, f"6_impact_edges.pdf")
+    for star in edges:
+        tower = star**2 + star + 1
+        raw_name = f"result_a1000_t{tower}_star{star}_nt{trj}_ts666.csv"
+        raw_csv = pd.read_csv(os.path.join("exp", "star", raw_name))
+
+        opt = np.array(raw_csv["total_towers_opt"].tolist())
+        sc_mept = np.array(raw_csv["total_towers_e_sc_mept"].tolist())
+        t_mept = np.array(raw_csv["total_towers_e_t_mept"].tolist())
+        ecc = np.array(raw_csv["eccentricity_opt"].tolist())
+
+        result_csv.loc[len(result_csv.index)] = [star, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
+                                                 np.std(opt), np.std(sc_mept), np.std(t_mept)]
+
+        if star <= 10:
+            result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"Star edges={star}", np.mean(ecc), np.std(ecc)]
+            i = i + 1
+
+    plot_aggregate_new(out_file_name, result_csv, "star", 'Number of edges')
+
+    # =================== Statistics =========================================
+    out_file_name = os.path.join(folder_out, f"9_statistics.pdf")
+    plot_statistics(out_file_name, result_stat_csv, "label", 'Scenario')
