@@ -51,9 +51,9 @@ If you use this repository, please cite our paper when it becomes available. For
 @article{Betti2024BVLoS,
   title={Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks},
   author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Palazzetti, Lorenzo and Pinotti, Cristina M.},
-  journal={IEEE/ACM Transactions on Networking (Under Review)},
-  year={2024},
-  note={Available soon}
+  journal={IEEE/ACM Transactions on Networking},
+  year={2025},
+  note={Under Review}
 }
 ```
 ---
