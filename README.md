@@ -8,8 +8,8 @@
 This repository contains the Python implementation of the algorithms and experiments described in our paper, **"Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks"**, which is currently under review.
 
 Unmanned Aerial Vehicles (UAVs), or drones, have transformative potential in civilian applications.
-However, their operational range is often limited by strict aviation regulations requiring Visual Line of Sight (\vlos). 
-Our work addresses this limitation by enabling Beyond Visual Line of Sight (BVLoS) operations, ensuring continuous remote monitoring through existing ad hoc wireless ground infrastructure.
+However, their operational range is often limited by strict aviation regulations requiring Visual Line of Sight (BVLoS). 
+Our work addresses this limitation by enabling Beyond BVLoS operations, ensuring continuous remote monitoring through existing ad hoc wireless ground infrastructure.
 
 This repository provides:
 - Implementations of polynomial-time algorithms for solving **single-trajectory problems**.
