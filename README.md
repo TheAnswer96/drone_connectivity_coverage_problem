@@ -56,7 +56,7 @@ If you use this repository, please cite our paper when it becomes available. For
   note={Available soon}
 }
 ```
-
+---
 ## Contact Us
 
 For questions, feedback, or collaboration opportunities, feel free to reach out to us:
