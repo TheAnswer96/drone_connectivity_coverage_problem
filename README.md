@@ -5,10 +5,10 @@
 
 ## Overview
 
-This repository contains the Python implementation of the algorithms and experiments described in our paper, **"Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks"**, which is currently under review.
+This repository contains the Python implementation of the algorithms and experiments described in our paper, **"Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks"**, which is currently under review on the IEEE/ACM Transactions on Networking journal.
 
 Unmanned Aerial Vehicles (UAVs), or drones, have transformative potential in civilian applications.
-However, their operational range is often limited by strict aviation regulations requiring Visual Line of Sight (BVLoS). 
+However, their operational range is often limited by strict aviation regulations requiring Visual Line of Sight (VLoS). 
 Our work addresses this limitation by enabling Beyond BVLoS operations, ensuring continuous remote monitoring through existing ad hoc wireless ground infrastructure.
 
 This repository provides:
@@ -40,7 +40,7 @@ Clone the repository and install the required Python dependencies:
 git clone https://github.com/TheAnswer96/drone_connectivity_coverage_problem.git
 cd drone_connectivity_coverage_problem
 pip install matplotlib networkx pandas
-Python main.py
+python main.py
 ```
 ---
 ## Citation
@@ -50,8 +50,8 @@ If you use this repository, please cite our paper when it becomes available. For
 ```bibtex
 @article{Betti2024BVLoS,
   title={Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks},
-  author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Palazzetti, Lorenzo and Pinotti, Cristina M},
-  journal={Under Review},
+  author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Palazzetti, Lorenzo and Pinotti, Cristina M.},
+  journal={IEEE/ACM Transactions on Networking (Under Review)},
   year={2024},
   note={Available soon}
 }
