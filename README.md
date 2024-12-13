@@ -41,4 +41,28 @@ git clone https://github.com/TheAnswer96/drone_connectivity_coverage_problem.git
 cd drone_connectivity_coverage_problem
 pip install matplotlib networkx pandas
 Python main.py
+```
+---
+## Citation
+
+If you use this repository, please cite our paper when it becomes available. For now, you can use the following placeholder:
+
+```bibtex
+@article{YourLastName2024,
+  title={Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks},
+  author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Palazzetti, Lorenzo and Pinotti, Cristina M},
+  journal={Under Review},
+  year={2024},
+  note={Available soon}
+}
+```
+
+## Contact Us
+
+For questions, feedback, or collaboration opportunities, feel free to reach out to us:
+
+- **Francesco Betti Sorbelli**: [francesco.bettisorbelli@unipg.it](mailto:francesco.bettisorbelli@unipg.it)
+- **Sajjad Ghobadi**: [sajjad.ghobadibabi@unipg.it](mailto:sajjad.ghobadibabi@unipg.it)
+- **Lorenzo Palazzetti**: [lorenzo.palazzetti@unipg.it](mailto:lorenzo.palazzetti@unipg.it)
+- **Cristina M. Pinotti**: [cristina.pinotti@unipg.it](mailto:cristina.pinotti@unipg.it)
 
