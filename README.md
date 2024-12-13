@@ -48,7 +48,7 @@ Python main.py
 If you use this repository, please cite our paper when it becomes available. For now, you can use the following placeholder:
 
 ```bibtex
-@article{YourLastName2024,
+@article{Betti2024BVLoS,
   title={Optimizing Connectivity and Coverage for UAV Paths in BVLoS Operations in Ad Hoc Networks},
   author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Palazzetti, Lorenzo and Pinotti, Cristina M},
   journal={Under Review},
