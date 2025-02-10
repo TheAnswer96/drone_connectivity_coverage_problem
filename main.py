@@ -87,87 +87,81 @@ ITERATIONS = 25
 
 DEBUG = False
 ########################################################################################################################
-
-if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description="Initialize experiments...")
-    #
-    # parser.add_argument("--area_side", type=int, default=1000, help="The side of the area you want to use. Express it in meters. [Default=1000]")
-    # parser.add_argument("--scenario", type=int, default=1, help="Scenario number ranges from -1 to 7. [Default=1]")
-    # parser.add_argument("--towers", type=int, default=250, help="Number of towers. [Default=250].")
-    # parser.add_argument("--radius_min", type=int, default=100, help="Minimum radius in meters. [Default=100]")
-    # parser.add_argument("--radius_max", type=int, default=300,
-    #                     help="Maximum radius in meters, must be >= RADIUS_MIN. [Default=300]")
-    # parser.add_argument("--lattice_neighbors", type=int, default=100,
-    #                     help="Must be >= 2, even, and <= TOWERS/2. [Default=100]")
-    # parser.add_argument("--star_edges", type=int, default=5, help="Number of star edges, must be >= 3. [Default=5]")
-    # parser.add_argument("--trajectories", type=int, default=100, help="Number of trajectories. [Default=100]")
-    # parser.add_argument("--min_dist_trajectory", type=int, default=500,
-    #                     help="Minimum distance of trajectory in meters, must be less than AREA_SIDE * sqrt(2). [Default=500]")
-    # parser.add_argument("--algorithm", type=int, default=6, help="Algorithm selection from 0 to 6. [Default=6]")
-    # parser.add_argument("--seed", type=int, default=0, help="Random seed. [Default=0]")
-    # parser.add_argument("--iterations", type=int, default=25, help="Number of iterations. [Default=25]")
-    # parser.add_argument("--debug", action='store_true', help="Enable debug mode. [Default=False]")
-    #
-    # args = parser.parse_args()
-    #
-    # AREA_SIDE = args.area_side
-    # SCENARIO = args.scenario
-    # TOWERS = args.towers
-    # RADIUS_MIN = args.radius_min
-    # RADIUS_MAX = args.radius_max
-    # LATTICE_NEIGHBORS = args.lattice_neighbors
-    # STAR_EDGES = args.star_edges
-    # TRAJECTORIES = args.trajectories
-    # MIN_DIST_TRAJECTORY = args.min_dist_trajectory
-    # ALGORITHM = args.algorithm
-    # SEED = args.seed
-    # ITERATIONS = args.iterations
-    # DEBUG = args.debug
-    #
-    # if SCENARIO == 3 or SCENARIO == 4:
-    #     if not is_square(TOWERS):
-    #         TOWERS = (math.isqrt(TOWERS) + 1) ** 2
-    #
-    # if SCENARIO == 6:
-    #     if TOWERS < 3:
-    #         TOWERS = 3
-    #
-    #     if LATTICE_NEIGHBORS % 2 == 1:
-    #         LATTICE_NEIGHBORS = LATTICE_NEIGHBORS - 1
-    #
-    #     if LATTICE_NEIGHBORS < 2:
-    #         LATTICE_NEIGHBORS = 2
-    #
-    #     # if LATTICE_NEIGHBORS > TOWERS / 2:
-    #     #     LATTICE_NEIGHBORS = TOWERS / 2
-    #
-    # if SCENARIO == 7:
-    #     TOWERS = STAR_EDGES**2 + STAR_EDGES + 1
-    #
-    # hyper = {
-    #         "area_side": AREA_SIDE,
-    #         "towers": TOWERS,
-    #         "radius_min": RADIUS_MIN,
-    #         "radius_max": RADIUS_MAX,
-    #         "trajectories": TRAJECTORIES,
-    #         "min_dist_trajectory": MIN_DIST_TRAJECTORY,
-    #         "scenario": SCENARIO,
-    #         "lattice_neighbors": LATTICE_NEIGHBORS,
-    #         "star_edges": STAR_EDGES,
-    #         "debug": DEBUG
-    #     }
-    #
-    # run_experiments(ITERATIONS, hyper, ALGORITHM)
-
-    #Run this function for exhaustive tests
-
-    # scenarios = [1,2,3,4,6,7]
-    # for scenario in scenarios:
-    #     run_experiments_paper(scenario)
+def is_square(n):
+    return math.isqrt(n) ** 2 == n
 
 
-    # visualize_exp_paper()
-    # fix_exp_results()
-    # get_plots_aggregated()
+def main():
+    parser = argparse.ArgumentParser(description="Run optimization experiments in sensor networks with a drone.")
 
-    new_plots()
+    parser.add_argument("--mode", type=str, choices=["single", "all", "plots"], required=True,
+                        help="Execution mode: 'single' for a single instance, 'all' for all experiments, 'plots' for visualization.")
+
+    # Parameters for single instance execution
+    parser.add_argument("--area_side", type=int, default=1000, help="Side length of the area in meters.")
+    parser.add_argument("--scenario", type=int, choices=[-1, 1, 2, 3, 4, 5, 6, 7], default=1,
+                        help="Scenario selection.")
+    parser.add_argument("--towers", type=int, default=250, help="Number of sensor towers.")
+    parser.add_argument("--radius_min", type=int, default=100, help="Minimum sensing radius.")
+    parser.add_argument("--radius_max", type=int, default=300, help="Maximum sensing radius.")
+    parser.add_argument("--lattice_neighbors", type=int, default=100, help="Lattice neighbors (even, >=2, <=TOWERS/2).")
+    parser.add_argument("--star_edges", type=int, default=5, help="Number of star edges (>=3).")
+    parser.add_argument("--trajectories", type=int, default=100, help="Number of drone trajectories.")
+    parser.add_argument("--min_dist_trajectory", type=int, default=500, help="Minimum trajectory distance.")
+    parser.add_argument("--algorithm", type=int, choices=range(7), default=6, help="Algorithm selection (0-6).")
+    parser.add_argument("--seed", type=int, default=0, help="Random seed for reproducibility.")
+    parser.add_argument("--iterations", type=int, default=25, help="Number of iterations.")
+    parser.add_argument("--debug", action='store_true', help="Enable debug mode.")
+
+    args = parser.parse_args()
+
+    print(f"Starting execution mode: {args.mode}")
+
+    if args.mode == "single":
+        print("Running a single experiment instance...")
+        # Adjust parameters based on scenario requirements
+        if args.scenario in [3, 4] and not is_square(args.towers):
+            args.towers = (math.isqrt(args.towers) + 1) ** 2
+        if args.scenario == 6:
+            args.towers = max(args.towers, 3)
+            args.lattice_neighbors = max(2, args.lattice_neighbors - (args.lattice_neighbors % 2))
+        if args.scenario == 7:
+            args.towers = args.star_edges ** 2 + args.star_edges + 1
+
+        hyperparameters = {
+            "area_side": args.area_side,
+            "towers": args.towers,
+            "radius_min": args.radius_min,
+            "radius_max": args.radius_max,
+            "trajectories": args.trajectories,
+            "min_dist_trajectory": args.min_dist_trajectory,
+            "scenario": args.scenario,
+            "lattice_neighbors": args.lattice_neighbors,
+            "star_edges": args.star_edges,
+            "debug": args.debug,
+        }
+        print(f"Hyperparameters: {hyperparameters}")
+        run_experiments(args.iterations, hyperparameters, args.algorithm)
+        print("Single experiment execution completed.")
+
+    elif args.mode == "all":
+        print("Running all experiments...")
+        scenarios = [1, 2, 3, 4, 6, 7]
+        for scenario in scenarios:
+            print(f"Running experiments for scenario {scenario}...")
+            run_experiments_paper(scenario)
+        print("All experiments execution completed.")
+
+    elif args.mode == "plots":
+        print("Generating plots...")
+        visualize_exp_paper()
+        fix_exp_results()
+        get_plots_aggregated()
+        new_plots()
+        print("Plot generation completed.")
+
+
+if __name__ == "__main__":
+    main()
+
+
