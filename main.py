@@ -1,7 +1,7 @@
 import math
 import time
 import problem_gen as problem
-from experiments import run_experiments_paper, visualize_exp_paper, fix_exp_results, get_plots_aggregated, new_plots
+from experiments import run_experiments_paper, visualize_exp_paper, fix_exp_results, get_plots_aggregated, new_plots, run_experiments
 from util import is_square
 import argparse
 

@@ -2,3 +2,8 @@ __pycache__
 venv
 .idea
 exp/rgg_fixed/result_a1000_t100_r150_nt100_ts666.csv
+exp/rgg_fixed/result_a1000_t50_r200_nt10_ts666.csv
+exp/rgg_fixed/result_a1000_t50_r200_nt10_ts666.csv
+exp/rgg_fixed/result_a1000_t50_r200_nt1_ts666.csv
+exp/rgg_fixed/result_a1000_t50_r200_nt10_ts666.csv
+exp/rgg_fixed/result_a1000_t50_r200_nt1_ts666.csv

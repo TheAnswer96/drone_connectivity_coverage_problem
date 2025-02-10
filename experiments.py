@@ -123,6 +123,65 @@ dir_dict = {
 #             print("########################")
 #     return
 
+def run_experiments(iterations, hyperparameters, algorithm):
+    """Runs a single experiment instance based on provided parameters."""
+
+    print("\n[INFO] Starting experiment execution...")
+    print(f"Iterations: {iterations}")
+    print(f"Algorithm: {algorithm}")
+    print(f"Hyperparameters: {hyperparameters}\n")
+
+    # Create experiment directory if not exists
+    exp_dir = "./exp"
+    if not os.path.exists(exp_dir):
+        print("[INFO] Creating 'exp' directory.")
+        os.makedirs(exp_dir)
+
+    # Set parameters
+    area_sides = [hyperparameters["area_side"]]
+    min_dist_trajectory = [int(area / 3 * 2) for area in area_sides]  # 2/3 of the area side
+    trajectories = [hyperparameters["trajectories"]]
+
+    debug = hyperparameters["debug"]
+
+    # Select experiment execution based on scenario
+    scenario = hyperparameters["scenario"]
+    print(f"[INFO] Running scenario {scenario}...\n")
+
+    if scenario == 1:
+        towers = [hyperparameters["towers"]]
+        radius = [hyperparameters["radius_min"]]
+        run_RGG_fixed(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    elif scenario == 2:
+        towers = [hyperparameters["towers"]]
+        radius = [(hyperparameters["radius_min"], hyperparameters["radius_max"])]
+        run_RGG_variable(area_sides, towers, radius, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    elif scenario == 3:
+        towers = [hyperparameters["towers"]]
+        run_regular_manhattan(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    elif scenario == 4:
+        towers = [hyperparameters["towers"]]
+        run_regular_diagonal(area_sides, towers, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    elif scenario == 5:
+        print("[ERROR] Scenario 5 (Bus) is not yet implemented.")
+        return
+
+    elif scenario == 6:
+        towers = [hyperparameters["towers"]]
+        lattice_neighbors = [hyperparameters["lattice_neighbors"]]
+        run_lattice(area_sides, towers, lattice_neighbors, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    elif scenario == 7:
+        star_edges = [hyperparameters["star_edges"]]
+        towers = [-1]  # Defined internally
+        run_star(area_sides, towers, star_edges, trajectories, min_dist_trajectory, iterations, dir_dict, debug)
+
+    print("[INFO] Experiment execution completed.\n")
+
 
 def run_experiments_paper(scene):
     if not os.path.exists("./exp"):
