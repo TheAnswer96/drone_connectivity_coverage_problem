@@ -1071,6 +1071,7 @@ def new_plots():
     if not os.path.exists(folder_out):
         os.makedirs(folder_out)
 
+    folder_out_csv = os.path.join(folder_out, "csv")
     # =================== Statistics =========================================
     result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
     result_stat_csv = result_stat_csv[0:0]
@@ -1098,7 +1099,7 @@ def new_plots():
             result_csv.loc[len(result_csv.index)] = [trj, np.mean(opt), np.mean(sc_mept), np.mean(t_mept),
                                                      np.std(opt), np.std(sc_mept), np.std(t_mept)]
 
-
+        result_csv.to_csv(os.path.join(folder_out_csv, f"0_impact_trajectories_rad{rad}_tw{tower}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "trajectories", 'Number of Trajectories')
 
     # =================== On RGG: Impact of Radius =========================================
@@ -1131,7 +1132,7 @@ def new_plots():
             if (tower == 100 and rad == 200) or (tower == 100 and rad == 300) or (tower == 200 and rad == 100) or (tower == 200 and rad == 300):
                 result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nr={rad}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
-
+        result_csv.to_csv(os.path.join(folder_out_csv, f"1_impact_radius_tw{tower}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius')
 
 
@@ -1166,7 +1167,7 @@ def new_plots():
             if (tower == 100 and rad == 100) or (tower == 100 and rad == 200) or (tower == 200 and rad == 100) or (tower == 200 and rad == 200):
                 result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nrm={rad}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
-
+        result_csv.to_csv(os.path.join(folder_out_csv, f"2_impact_radius_var_tw{tower}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "rad", 'Radius min')
 
 
@@ -1199,12 +1200,13 @@ def new_plots():
 
             # result_stat_csv.loc[len(result_stat_csv.index)] = [i, np.mean(ecc)-1, np.std(ecc)]
             # i = i + 1
-
+        result_csv.to_csv(os.path.join(folder_out_csv, f"3_impact_towers_rad{rad}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "tower", 'Number of Towers')
 
     # =================== Statistics RGG =========================================
     out_file_name = os.path.join(folder_out, f"9_statistics_rgg.pdf")
     plot_statistics(out_file_name, result_stat_csv, "label", 'RGG: fixed vs variable')
+    result_stat_csv.to_csv(os.path.join(folder_out_csv, f"9_statistics_rgg.csv"), index=False)
 
     result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
     result_stat_csv = result_stat_csv[0:0]
@@ -1238,11 +1240,13 @@ def new_plots():
                 result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"{lab} s={int(np.sqrt(tower))}", np.mean(ecc)-1, np.std(ecc)]
                 i = i + 1
 
+        result_csv.to_csv(os.path.join(folder_out_csv, f"4_impact_grid_{scenario}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "side", 'Side of Grid')
 
     # =================== Statistics Grid =========================================
     out_file_name = os.path.join(folder_out, f"9_statistics_grids.pdf")
     plot_statistics(out_file_name, result_stat_csv, "label", 'Grids: Manhattan vs Diagonal')
+    result_stat_csv.to_csv(os.path.join(folder_out_csv, f"9_statistics_grids.csv"), index=False)
 
     result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
     result_stat_csv = result_stat_csv[0:0]
@@ -1275,11 +1279,13 @@ def new_plots():
             result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"t={tower}\nn={neig}", np.mean(ecc)-1, np.std(ecc)]
             i = i + 1
 
+        result_csv.to_csv(os.path.join(folder_out_csv, f"5_impact_neighboring_tw{tower}.csv"), index=False)
         plot_aggregate_new(out_file_name, result_csv, "neig", 'Neighboring factor')
 
     # =================== Statistics Grid =========================================
     out_file_name = os.path.join(folder_out, f"9_statistics_lattice.pdf")
     plot_statistics(out_file_name, result_stat_csv, "label", 'Lattice')
+    result_stat_csv.to_csv(os.path.join(folder_out_csv, f"9_statistics_lattice.csv"), index=False)
 
     result_stat_csv = pd.DataFrame(columns=["combo", "label", "ecc_opt", "ecc_opt_std"])
     result_stat_csv = result_stat_csv[0:0]
@@ -1312,8 +1318,10 @@ def new_plots():
         result_stat_csv.loc[len(result_stat_csv.index)] = [i, f"e={star}", np.mean(ecc)-1, np.std(ecc)]
         i = i + 1
 
+    result_csv.to_csv(os.path.join(folder_out_csv, f"6_impact_edges.csv"), index=False)
     plot_aggregate_new(out_file_name, result_csv, "star", 'Number of edges')
 
     # =================== Statistics =========================================
     out_file_name = os.path.join(folder_out, f"9_statistics_star.pdf")
+    result_stat_csv.to_csv(os.path.join(folder_out_csv, f"9_statistics_star.csv"), index=False)
     plot_statistics(out_file_name, result_stat_csv, "label", 'Scenario')

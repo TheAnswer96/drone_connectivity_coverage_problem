@@ -154,9 +154,9 @@ def main():
 
     elif args.mode == "plots":
         print("Generating plots...")
-        visualize_exp_paper()
-        fix_exp_results()
-        get_plots_aggregated()
+        # visualize_exp_paper()
+        # fix_exp_results()
+        # get_plots_aggregated()
         new_plots()
         print("Plot generation completed.")
 
